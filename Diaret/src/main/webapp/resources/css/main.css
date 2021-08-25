@@ -1,0 +1,104 @@
+/* font imported */
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap');
+
+/* input imported */
+@import url("https://fonts.googleapis.com/css?family=News+Cycle:400,700&display=swap");
+
+#mainDiv {
+	height: 100vh;
+	display : flex;
+	/* flex-direction : row(기본 값) */
+}
+
+.container {
+	padding: 0px;
+}
+
+#leftDiv, #rightDiv {
+	position : relative;
+}
+
+#leftDiv {
+	flex-basis : 66%;
+}
+
+#rightDiv {
+	background-image: url("http://127.0.0.1:8010/diaret/resources/images/loginBackground.jpg");
+	background-repeat : no-repeat;
+	background-size : cover;
+	align-items: center;
+	flex-basis : 34%;
+
+	display : flex;
+	flex-flow : column wrap;
+	justify-content: center;
+	box-shadow: -10px 0px 50px black;
+}
+
+h1 {
+	font-family: 'Nanum Pen Script', cursive;
+	font-size: 6rem;
+}
+
+.firstStr {
+	margin: 0px;
+	padding-top: 5%;
+}
+
+input {
+	margin-top: 2.5%;
+	margin-bottom: 2.5%;
+}
+
+.carousel, .carousel-inner, .item {
+	text-align: center;
+	height: 100%;
+	width: 100%;
+}
+
+.slide1 {
+	background-image : url("http://127.0.0.1:8010/diaret/resources/images/tutorialBackground1.jpg");
+	background-repeat : no-repeat;
+	background-size : cover;
+}
+
+.slide2 {
+	background-image: url("http://127.0.0.1:8010/diaret/resources/images/tutorialBackground2.jpg");
+	background-repeat : no-repeat;
+	background-size : cover;
+}
+
+.slide3 {
+	background-image: url("http://127.0.0.1:8010/diaret/resources/images/tutorialBackground3.jpg");
+	background-repeat : no-repeat;
+	background-size : cover;
+	color : white;
+}
+
+.carousel-indicators li {
+	width: 30px;
+	height: 30px;
+}
+
+.carousel-indicators .active {
+	width: 36px;
+	height: 36px;
+}
+
+.tutorial_imgs {
+	margin-top: 5%;
+	margin-left: 15%;
+	height: 50%;
+	width: 70%;
+	background-color: white;
+}
+
+.alert {
+	width: 48%;
+	text-align: center;
+}
+
+.inNoteBook[name='id'] {
+	margin-top: 0%;
+	margin-bottom: 3%;
+}

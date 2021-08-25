@@ -1,0 +1,13 @@
+@charset "UTF-8";
+
+body {
+	margin: 5%;
+}
+
+form {
+	text-align: center;
+}
+
+input {
+	margin-top: 5%;
+}
