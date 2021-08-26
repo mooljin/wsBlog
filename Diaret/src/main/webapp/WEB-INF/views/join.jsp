@@ -6,6 +6,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	<script src="${ pageContext.request.contextPath }/resources/js/ui/jquery.json-2.2.min.js" type="text/javascript"></script>
 	<script src="${ pageContext.request.contextPath }/resources/js/join.js" type="text/javascript"></script>
 	<!-- js import end -->
 
@@ -22,17 +23,17 @@
 	<body>
 		<p class="alert alert-info">모든 항목은 필수 입력 사항입니다.</p>
 		<hr>
-		<form action="test.do" method="post">
-			<input type="text" class="form-control" placeholder="아이디" name="id"/>
-			<input type="password" class="form-control" placeholder="비밀번호" name="pw"/>
-			<input type="password" class="form-control" placeholder="비밀번호 확인" name="re"/>
-			<input type="text" class="form-control" placeholder="성함" name="name"/>
-			<input type="text" class="form-control" placeholder="이메일" name="email"/>
-			<input type="text" class="form-control" placeholder="전화번호" name="tel"/>
-			<input type="text" class="form-control" placeholder="닉네임" name="nickname"/>
+		<form method="post" id="joinForm">
+			<input type="text" class="form-control" placeholder="아이디" name="userId" />
+			<input type="password" class="form-control" placeholder="비밀번호" name="userPw" />
+			<input type="password" class="form-control" placeholder="비밀번호 확인" name="userPwRe" />
+			<input type="text" class="form-control" placeholder="성함" name="userName" />
+			<input type="email" class="form-control" placeholder="이메일" name="userEmail" />
+			<input type="tel" class="form-control" placeholder="전화번호(000-0000-0000)" name="userTel" pattern="[0-9]{2,3}-[0-9]{3,4}-[0-9]{3,4}" maxlength="13" />
+			<input type="text" class="form-control" placeholder="닉네임" name="userNickname" />
 			<br>
-			<button type="submit" class="btn btn-success">가입</button>
-			<button class="btn btn-danger">취소</button>
+			<button type="button" class="btn btn-success" id="btnJoin">가입</button>
+			<button type="button" class="btn btn-danger" id="btnCancel">취소</button>
 		</form>
 	</body>
 </html>

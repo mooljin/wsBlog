@@ -15,8 +15,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class HomeController {
@@ -37,25 +39,33 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "/doJoin.do")
-	public String doJoin(@RequestParam Map<String, String> para) {
+	public String doJoin(@RequestParam Map<String, String> paramMap) {
 
 		return "redirect:/";
 	}
 
 	//테스트용
-	@RequestMapping(value = "/test.do")
-	public HashMap<String, Object> test(String id, ModelMap model) {
-		HashMap<String, Object> resultMap = new HashMap<String, Object>();
+	@RequestMapping(value = "/checkId.do")
+	@ResponseBody
+	public String checkId(@RequestParam Map<String, String> paramMap) {
+		logger.info(Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName());
 
-		SqlSessionFactory dao = null;
-		List resultList = null;
+		String isExistId = null;
+		SqlSessionFactory temp = null;
 		SqlSession sqlSession = null;
 
 		try {
-			dao = sqlSessionFactory.getObject();
-			sqlSession = dao.openSession();
+			temp = sqlSessionFactory.getObject();
+			sqlSession = temp.openSession();
 
-			System.out.println(sqlSession.selectOne("join.selectUser", id));
+			sqlSession.selectList("join.selectUser", paramMap);
+			List<?> userData = sqlSession.selectList("join.selectUser", paramMap);
+
+			if(userData.size() > 0) {
+				isExistId = "T";
+			} else {
+				isExistId = "F";
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -63,6 +73,6 @@ public class HomeController {
 			sqlSession.close();
 		}
 
-		return resultMap;
+		return isExistId;
 	}
 }

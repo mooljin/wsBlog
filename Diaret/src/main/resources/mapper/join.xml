@@ -4,7 +4,9 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="join">
-  <select id="selectUser" parameterType="String" resultType="hashMap">
-    SELECT * FROM USER_INFO WHERE user_id = #{user_id}
+  <select id="selectUser" parameterType="Map" resultType="hashMap">
+    SELECT USER_NUM,USER_ID, USER_PW, USER_NAME, USER_NICK, USER_EMAIL, USER_TEL
+      FROM USER_INFO
+     WHERE USER_ID = #{userId}
   </select>
 </mapper>

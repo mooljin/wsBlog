@@ -24,7 +24,7 @@ $(document).ready(function() {
 		var popup = window.open(
 			"goJoin.do",
 			"join",
-			"width=300, height=500, left=1500, top=" + ((screenHeight - 500) / 2) + ", scrollbars=no, toolbar=0, menubar=no"
+			"width=400, height=630, left=1500, top=" + ((screenHeight - 500) / 2) + ", scrollbars=no, toolbar=0, menubar=no"
 		);
 	});
 });
