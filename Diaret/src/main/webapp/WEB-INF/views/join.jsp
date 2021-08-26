@@ -22,7 +22,7 @@
 	<body>
 		<p class="alert alert-info">모든 항목은 필수 입력 사항입니다.</p>
 		<hr>
-		<form action="doJoin.do" method="post">
+		<form action="test.do" method="post">
 			<input type="text" class="form-control" placeholder="아이디" name="id"/>
 			<input type="password" class="form-control" placeholder="비밀번호" name="pw"/>
 			<input type="password" class="form-control" placeholder="비밀번호 확인" name="re"/>
