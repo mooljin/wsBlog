@@ -19,12 +19,16 @@ $(document).ready(function() {
 	$("#join").click(function(){
 		var screenWidth = screen.width;
 		var screenHeight = screen.height;
-		console.log(screenWidth);
-		console.log(screenHeight);
 		var popup = window.open(
 			"goJoin.do",
 			"join",
 			"width=400, height=630, left=1500, top=" + ((screenHeight - 500) / 2) + ", scrollbars=no, toolbar=0, menubar=no"
 		);
+	});
+
+	//로그인 로직 - 비번 암호화하고 요청
+	$("#login").click(function() {
+		$("input[name=userPw]").val(btoa($("input[name=userPw]").val()));
+		$("#loginForm").submit();
 	});
 });

@@ -6,12 +6,12 @@
 	<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="${ pageContext.request.contextPath }/resources/js/ui/jquery.json-2.2.min.js" type="text/javascript"></script>
 	<script src="${ pageContext.request.contextPath }/resources/js/main.js" type="text/javascript"></script>
 	<!-- js import end -->
 
 	<!-- css import start -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 	<link rel="stylesheet" href="${ pageContext.request.contextPath }/resources/css/main.css">
 	<!-- css import end -->
 
@@ -71,12 +71,12 @@
 			<!-- right UI -->
 			<div id="rightDiv">
 				<p class="alert alert-info inNoteBook">환영합니다.</p>
-				<form method="post">
-					<input class="form-control inNoteBook" type="text" placeholder="아이디" name="id">
-					<input class="form-control inNoteBook" type="password" placeholder="비밀번호" name="pw">
-					<button class="btn btn-success inNoteBook" type="submit" id="login">로그인</button>
-					<button class="btn btn-success inNoteBook" id="join">회원가입</button>
-					<button class="btn btn-warning inNoteBook" id="kakao">카카오톡으로 로그인</button>
+				<form action="doLogin.do" method="post" id="loginForm">
+					<input class="form-control inNoteBook" type="text" placeholder="아이디" name="userId" required/>
+					<input class="form-control inNoteBook" type="password" placeholder="비밀번호" name="userPw" required/>
+					<button type="button" class="btn btn-success inNoteBook" id="login">로그인</button>
+					<button type="button" class="btn btn-success inNoteBook" id="join">회원가입</button>
+					<button type="button" class="btn btn-warning inNoteBook" id="kakao">카카오톡으로 로그인</button>
 				</form>
 			</div>
 		</div>

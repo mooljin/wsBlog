@@ -17,7 +17,6 @@ $(document).ready( function() {
 		}
 
 		// input 공백체크, 벨리데이션 체크
-		// todo_list : 유효성체크
 		$("#joinForm").find("input").each(function(index, item) {
 			if($.trim($(item).val()) == "") {
 				saveFg = false;
