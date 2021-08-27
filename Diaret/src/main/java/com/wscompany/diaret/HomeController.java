@@ -39,13 +39,6 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "/doJoin.do")
-	public String doJoin(@RequestParam Map<String, String> paramMap) {
-
-		return "redirect:/";
-	}
-
-	//테스트용
-	@RequestMapping(value = "/checkId.do")
 	@ResponseBody
 	public String checkId(@RequestParam Map<String, String> paramMap) {
 		logger.info(Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName());
@@ -64,6 +57,7 @@ public class HomeController {
 			if(userData.size() > 0) {
 				isExistId = "T";
 			} else {
+				sqlSession.insert("join.insert", paramMap);
 				isExistId = "F";
 			}
 

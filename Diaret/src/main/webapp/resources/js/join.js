@@ -11,7 +11,7 @@ $(document).ready( function() {
 
 
 		// 비밀번호 일치 체크
-		if($("input[name=userPw]").val() == $("input[name=userPwRe]").val()) {
+		if($("input[name=userPw]").val() != $("input[name=userPwRe]").val()) {
 			saveFg = false;
 			valMsg = "비밀번호가 일치하지 않습니다.";
 		}
@@ -25,36 +25,56 @@ $(document).ready( function() {
 				return false;
 			} else { // 유효성 체크
 				if($(item).attr("name") == "userEmail") {
-					saveFg = false;
+
+					var emailVal = $(item).val();
+					var regExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
+
+					//정규식에 부합하는 문자열이 있으면 유효한 이메일
+					if (emailVal.match(regExp) == null) {
+						valMsg = "이메일 형식에 맞게 입력하세요.";
+						saveFg = false;
+					}
+
 				} else if($(item).attr("name") == "userTel") {
-					saveFg = false;
+
+					var telVal = $(item).val();
+					var regExp = /^[0-9]{3}-[0-9]{3,4}-[0-9]{4}/;
+
+					if (telVal.match(regExp) == null) {
+						valMsg = "전화번호 형식에 맞게 입력하세요.\n(숫자 11자리, - 포함)";
+						saveFg = false;
+					}
 				}
 			}
 		});
 
-		// 아이디 중복체크
-		var data = $("#joinForm").find("input").serializeObject();
-
-		if(!($.trim($("input[name='userId']").val()) == "" || $.trim($("input[name='userId']").val()) == null || $.trim($("input[name='userId']").val()) == undefined)) {
-			$.ajax({
-				type: 'post',
-				url: 'checkId.do',
-				data: data,
-				async: false,
-				success: function(isExistId) {
-					if(isExistId == "T") {
-						valMsg = "중복된 아이디가 존재합니다.";
-						saveFg = false;
-					}
-				}
-			});
-		}
-
+		//위 조건이 만족하면 아이디 중복 검사 시작
 		if(!saveFg) {
 			alert(valMsg);
 			return;
 		} else {
-			// 저장로직
+			//아이디 중복 검사 후 중복이면 가입 불가 아니면 바로 가입 완료
+			var data = $("#joinForm").find("input").serializeObject();
+			data.userPw = btoa($("input[name=userPw]").val());
+			delete(data['userPwRe']);
+
+			if(!($.trim($("input[name='userId']").val()) == "" || $.trim($("input[name='userId']").val()) == null || $.trim($("input[name='userId']").val()) == undefined)) {
+				$.ajax({
+					type: 'post',
+					url: 'doJoin.do',
+					data: data,
+					async: false,
+					success: function(isExistId) {
+						if(isExistId == "T") {
+							alert("중복된 아이디가 존재합니다.");
+							return;
+						} else {
+							alert("가입이 완료되었습니다.");
+							self.close();
+						}
+					}
+				});
+			}
 		}
 	});
 

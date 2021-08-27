@@ -5,8 +5,12 @@
 
 <mapper namespace="join">
   <select id="selectUser" parameterType="Map" resultType="hashMap">
-    SELECT USER_NUM,USER_ID, USER_PW, USER_NAME, USER_NICK, USER_EMAIL, USER_TEL
+    SELECT USER_NUM, USER_ID, USER_PW, USER_NAME, USER_NICK, USER_EMAIL, USER_TEL
       FROM USER_INFO
      WHERE USER_ID = #{userId}
+  </select>
+  <select id="insert" parameterType="Map" resultType="hashMap">
+    INSERT INTO USER_INFO (USER_ID, USER_PW, USER_NAME, USER_NICK, USER_EMAIL, USER_TEL)
+		 VALUES (#{userId}, #{userPw}, #{userName}, #{userNickname}, #{userEmail}, #{userTel});
   </select>
 </mapper>

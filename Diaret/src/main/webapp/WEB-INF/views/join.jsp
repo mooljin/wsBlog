@@ -29,7 +29,7 @@
 			<input type="password" class="form-control" placeholder="비밀번호 확인" name="userPwRe" />
 			<input type="text" class="form-control" placeholder="성함" name="userName" />
 			<input type="email" class="form-control" placeholder="이메일" name="userEmail" />
-			<input type="tel" class="form-control" placeholder="전화번호(000-0000-0000)" name="userTel" pattern="[0-9]{2,3}-[0-9]{3,4}-[0-9]{3,4}" maxlength="13" />
+			<input type="tel" class="form-control" placeholder="전화번호(000-0000-0000)" name="userTel" maxlength="13"/>
 			<input type="text" class="form-control" placeholder="닉네임" name="userNickname" />
 			<br>
 			<button type="button" class="btn btn-success" id="btnJoin">가입</button>
