@@ -23,8 +23,8 @@
 <body>
 	<div id="leftDiv">
 		<!-- left UI -->
-		<!-- 닉네임 보여주기 -->
 		<div id="profile">
+			<!-- 닉네임 보여주기 -->
 			<p id="nickname">사탄아저씨</p>
 			<div id="alignCenter">
 				<img id="imgProfile" alt="defaultProfile.jpg" src="${ pageContext.request.contextPath }/resources/images/fallguy.jpg">
@@ -115,7 +115,7 @@
 		</div>
 	</div>
 	<div id="rightDiv">
-		<jsp:include page="${ pageContext.request.contextPath }/../WEB-INF/views/post.jsp"/>
+		<jsp:include page="${ pageContext.request.contextPath }/../WEB-INF/views/modify.jsp"/>
 	</div>
 </body>
 </html>

@@ -18,8 +18,17 @@
 	background-color: rbga( 0, 0, 0, 0);
 }
 
+#categoryTitle, #categoryTitle * {
+	font-size: 15px;
+}
+
+#postTitle {
+	margin-top: 1.5%;
+}
+
 #displayFlex {
 	display: flex;
+	align-items: baseline;
 }
 
 #postDate {
