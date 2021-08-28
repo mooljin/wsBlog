@@ -1,4 +1,8 @@
 $(document).ready(function() {
+	if($("#unvisibleValue").text()) {
+		alert("아이디 혹은 비밀번호가 다릅니다.");
+	}
+
 	//휠 클릭 시 슬라이드 전환
 	$(".item").on("wheel", function (event){
 
@@ -22,7 +26,7 @@ $(document).ready(function() {
 		var popup = window.open(
 			"goJoin.do",
 			"join",
-			"width=400, height=630, left=1500, top=" + ((screenHeight - 500) / 2) + ", scrollbars=no, toolbar=0, menubar=no"
+			"width=500, height=630, left=" + ((screenWidth - 500) / 2) + ", top=" + ((screenHeight - 630) / 2) + ", scrollbars=no, toolbar=0, menubar=no"
 		);
 	});
 

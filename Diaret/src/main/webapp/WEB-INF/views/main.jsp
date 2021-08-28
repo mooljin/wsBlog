@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 	<!-- js import start -->
@@ -22,6 +23,7 @@
 	</head>
 
 	<body>
+		<p style="display:none" id="unvisibleValue">${ loginFailed }</p>
 		<div id="mainDiv">
 			<!-- left UI -->
 			<div id="leftDiv" class="container">

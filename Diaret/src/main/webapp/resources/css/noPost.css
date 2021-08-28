@@ -1,0 +1,26 @@
+@charset "UTF-8";
+
+/* font imported */
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap');
+
+#rightDiv {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}
+
+#rightDiv * {
+	font-family: 'Nanum Pen Script', cursive;
+	margin: 30px;
+}
+
+.firstGuideText {
+	font-size: 6rem;
+}
+
+#btnNewFirstPosting {
+	font-size: 4rem;
+	border-radius: 30px;
+}

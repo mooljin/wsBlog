@@ -68,6 +68,8 @@ $(document).ready( function() {
 							alert("중복된 아이디가 존재합니다.");
 							return;
 						} else {
+							//to_do_List : 가입 완료 시 알림창이 main페이지에서 띄워야 함.
+							//모르게써여...흑흑...
 							alert("가입이 완료되었습니다.");
 							self.close();
 						}
