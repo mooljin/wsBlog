@@ -11,6 +11,6 @@
   </select>
   <insert id="insert" parameterType="Map">
     INSERT INTO USER_INFO (USER_ID, USER_PW, USER_NAME, USER_NICK, USER_EMAIL, USER_TEL)
-		 VALUES (#{userId}, #{userPw}, #{userName}, #{userNickname}, #{userEmail}, #{userTel});
+		 VALUES (#{userId}, #{userPw}, #{userName}, #{userNick}, #{userEmail}, #{userTel});
   </insert>
 </mapper>

@@ -8,4 +8,31 @@
 		DELETE FROM USER_INFO
          WHERE USER_ID = #{userId}
 	</delete>
+	<update id="updateUser" parameterType="Map">
+		UPDATE USER_INFO
+		   SET USER_PW = #{userPw}, USER_EMAIL = #{userEmail}, USER_TEL = #{userTel}, USER_NICK = #{userNick}
+		 WHERE USER_ID = #{userId}
+	</update>
+	<update id="updateUserWithoutPw" parameterType="Map" >
+		UPDATE USER_INFO
+		   SET USER_EMAIL = #{userEmail}, USER_TEL = #{userTel}, USER_NICK = #{userNick}
+         WHERE USER_ID = #{userId}
+	</update>
+	<!--
+	굳이 select문을 넣은 이유는 map의 key값을 통일시키기 위함.
+	이유는
+	1. select문 이외에는 resultType이라는 속성이 없음. (결과를 반환하는 쿼리문은 select가 유일)
+	2. parameterType으로 넘어가는 map의 키와 resultType으로 넘어오는 map의 키의 표기법이 일치하지 않음.
+	(parameterType은 입력 파라미터(예 : #{userId})의 표기법을 따르며,
+	resultType은 쿼리문에서 사용되었던 컬럼 이름(예 : USER_ID)의 표기법을 따름.)
+
+	이러한 이유로 회원 정보 수정 시 세션의 정보를 수정 된 정보로 바꿔줘야 하는데, 이 과정 중 표기법이 서로 일치하지 않아
+	jsp파일에서 EL로 불러올 때 상당한 불편함이 있었음.
+	그러므로 키 표기법을 맞추기 위해 회원 정보를 수정한 이후의 회원 정보를 다시 불러와서 적용하는 꼼수를 사용.
+	 -->
+	<select id="selectAfterUpdate" parameterType="String" resultType="hashMap">
+		SELECT USER_NUM, USER_ID, USER_PW, USER_NAME, USER_NICK, USER_EMAIL, USER_TEL
+      	  FROM USER_INFO
+         WHERE USER_ID = #{userId}
+	</select>
 </mapper>

@@ -57,25 +57,23 @@ $(document).ready( function() {
 			data.userPw = btoa($("input[name=userPw]").val());
 			delete(data['userPwRe']);
 
-			if(!($.trim($("input[name='userId']").val()) == "" || $.trim($("input[name='userId']").val()) == null || $.trim($("input[name='userId']").val()) == undefined)) {
-				$.ajax({
-					type: 'post',
-					url: 'doJoin.do',
-					data: data,
-					async: false,
-					success: function(isExistId) {
-						if(isExistId == "T") {
-							alert("중복된 아이디가 존재합니다.");
-							return;
-						} else {
-							//to_do_List : 가입 완료 시 알림창이 main페이지에서 띄워야 함.
-							//모르게써여...흑흑...
-							alert("가입이 완료되었습니다.");
-							self.close();
-						}
+			$.ajax({
+				type: 'post',
+				url: 'doJoin.do',
+				data: data,
+				async: false,
+				success: function(isExistId) {
+					if(isExistId == "T") {
+						alert("중복된 아이디가 존재합니다.");
+						return;
+					} else {
+						//to_do_List : 가입 완료 시 알림창이 main페이지에서 띄워야 함.
+						//모르게써여...흑흑...그냥 html에서 hidden 값 쓸까여...
+						alert("가입이 완료되었습니다.");
+						self.close();
 					}
-				});
-			}
+				}
+			});
 		}
 	});
 

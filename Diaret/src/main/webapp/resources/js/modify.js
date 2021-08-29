@@ -5,8 +5,27 @@ $(document).ready( function() {
 
 	//이벤트가 발생했던 버튼에 따라 요청으로 전송할 양식이 다륾.
 	var chooseForm = function (form) {
+		$("#userPw").val(btoa($("#userPw").val()));
 		if($("#sessionUserPw").val() == btoa($("#identifyInput").val())) {
-			$(form).submit();
+			//"저장 버튼을 누르고 모든 사용자 입력값이 조건에 부합할 때 추가로 해야 할 것들
+			if(eventSrc == "doModify") {
+				var data = $(form).serializeObject();
+				//아래 위치에서 암호화를 하면 적용되지 않아서 8번줄에서 암호화를 진행함. 이유를 모르겠음.
+//				data.userPw = btoa($("#userPw").val());
+				//serializeObject()을 사용하려면 반드시 name 속성을 설정해야 한다.
+				delete(data['userPwRe']);
+
+				$.ajax({
+					type: 'post',
+					url: 'doModify.do',
+					data: data,
+					async: false,
+					success: function() {
+						alert("수정되었습니다.");
+						$("#settingInfoForm").submit();
+					}
+				});
+			}
 		} else {
 			alert("비밀번호가 다릅니다.");
 		}
@@ -35,6 +54,7 @@ $(document).ready( function() {
 
 	//"이미지 저장" 버튼 누를 시
 	$("#applyImg").click( function() {
+		console.log($("#srcImg").val());
 		eventSrc = event.target.id;
 		if($.trim($("#srcImg").val()) == "") {
 			$(".modal").removeAttr("id");
@@ -53,7 +73,7 @@ $(document).ready( function() {
 		var valMsg = "";
 
 		//1. 이메일, 전화번호, 닉네임 공란 체크
-		if( !( $("#userEmail").val() && $("#userTel").val() && $("#userNickname").val() ) ) {
+		if( !( $("#userEmail").val() && $("#userTel").val() && $("#userNick").val() ) ) {
 			valMsg = "이메일, 전화번호, 또는 닉네임이 빈칸인지 확인하세요.";
 		}
 
@@ -82,7 +102,7 @@ $(document).ready( function() {
 		if(!(valMsg)) {
 			var isBlank = $("#userPw").val() && $("#userPwRe").val();
 			var isMatch = $("#userPw").val() == $("#userPwRe").val();
-			if( !( isBlank && isMatch) ) {
+			if( !( isBlank || isMatch) ) {
 				valMsg = "새로 사용할 비밀번호가 서로 일치한지 확인하세요.";
 			}
 		}
@@ -110,3 +130,41 @@ $(document).ready( function() {
 		$("#settingInfoForm").attr("action", "doWithdraw.do");
 	});
 });
+
+//첨부파일이 이미지 파일인지 검사
+function chk_file_type(obj) {
+
+	var file_kind = obj.value.lastIndexOf('.');
+	var file_name = obj.value.substring(file_kind+1,obj.length);
+	var file_type = file_name.toLowerCase();
+	var check_file_type=['jpg','gif','png','jpeg','bmp','tif'];
+
+	if(check_file_type.indexOf(file_type)==-1) {
+		alert('이미지 파일만 업로드를 할 수 있습니다.');
+//		//parentNode : 이 객체의 부모 노드를 들고 온다. 여기서는 #settingImgForm.
+//		var parent_Obj=obj.parentNode;
+//		//replaceChild(교체할 대상, 교체될 대상) : 자신의 자식 노드를 교체한다.
+//		//cloneNode(true) : 해당 노드를 복제한다. 자식 노드까지 복사하려면 true.
+//		//#imgSrc의 자식 노드는 없으므로 여기선 false로 줘도 상관 없음.
+//		var node=parent_Obj.replaceChild(obj.cloneNode(true),obj);
+//
+//		//이건 솔직히 복붙한 코드인데.. 왜 이렇게까지 한 거지? 이거 없어도 잘 돌아감.
+
+		document.getElementById("srcImg").value = "";    //초기화를 위한 추가 코드
+	} else {
+		//되긴 되는데 왜 되지? 잠시만...
+		var input = document.getElementById("srcImg");
+		//파일을 읽도록 해주는 객체?
+		var fReader = new FileReader();
+//		readAsDataURL 메서드는 컨텐츠를 특정 Blob 이나 File에서 읽어오는 역할을 합니다.
+//		읽어오는 read 행위가 종료되는 경우에, readyState (en-US) 의 상태가 DONE이 되며,
+//		loadend (en-US) 이벤트가 트리거 됩니다.
+//		이와 함께,  base64 인코딩 된 스트링 데이터가 result  속성(attribute)에 담아지게 됩니다.
+		fReader.readAsDataURL(input.files[0]);
+		fReader.onloadend = function(event){
+		    var img = document.getElementById("imgPreview");
+		    //이벤트가 발생한 blob, img와 같은 대상을 인코딩 등으로 가공한 결과를 src에 넣는다.
+		    img.src = event.target.result;
+		}
+	}
+}

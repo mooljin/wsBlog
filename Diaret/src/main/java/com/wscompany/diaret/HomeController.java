@@ -168,12 +168,39 @@ public class HomeController {
 
 	//"applyImg.do"
 
-	//"doModify.do"
+	@RequestMapping(value = "/doModify.do")
+	public String doModify(@RequestParam Map<String, Object> paramMap, HttpSession session, HttpServletRequest request) {
+		System.out.println(paramMap);
+		String userPw = (String) paramMap.get("userPw");
 
-	//"doWithdraw.do"
+		SqlSessionFactory temp = null;
+		SqlSession sqlSession = null;
+		Map<String, Object> userDataMap = null;
+
+		try {
+			temp = sqlSessionFactory.getObject();
+			sqlSession = temp.openSession();
+
+			if(userPw == null || userPw.equals("")) {
+				sqlSession.update("modify.updateUserWithoutPw", paramMap);
+			} else {
+				sqlSession.update("modify.updateUser", paramMap);
+			}
+			//세션 정보 갱신
+			userDataMap = sqlSession.selectOne("modify.selectAfterUpdate", paramMap.get("userId"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			sqlSession.close();
+		}
+		session.setAttribute("userDataMap", userDataMap);
+		request.setAttribute("includePage", "noPost");
+
+		return "diary";
+	}
+
 	@RequestMapping(value = "/doWithdraw.do")
 	public String doWithdraw(HttpServletRequest request, HttpSession session) {
-		System.out.println("doWithdraw.do");
 		Map<String, Object> userDataMap = (Map<String, Object>) session.getAttribute("userDataMap");
 		String userId = (String) userDataMap.get("USER_ID");
 
@@ -192,8 +219,16 @@ public class HomeController {
 			sqlSession.close();
 		}
 
-		session.invalidate();
-		HttpSession newSession = request.getSession(true);
+		request.getSession().invalidate();
+		request.getSession(true);
+
+		return "main";
+	}
+
+	@RequestMapping(value = "/doLogout.do")
+	public String doLogout(HttpServletRequest request) {
+		request.getSession().invalidate();
+		request.getSession(true);
 
 		return "main";
 	}

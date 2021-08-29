@@ -13,14 +13,14 @@
 	<!-- 설정된 이미지가 뜨는 div -->
 	<div id="imgBox">
 		<div id="square">
-			<img id="imgPreview" alt="defaultProfile.jpg" src="${ pageContext.request.contextPath }/resources/images/fallguy.jpg">
+			<img id="imgPreview" alt="defaultProfile.jpg" src="${ pageContext.request.contextPath }/resources/images/fallguy.jpg" width="100" height="100">
 		</div>
 	</div>
-	<!-- 이미지 관련 버튼,만 모아놓은 div -->
+	<!-- 이미지 관련 버튼만 모아놓은 div -->
 	<div id="inputImg">
 		<form id="settingImgForm">
 			<h1 id="title1">프로필 사진 변경</h1>
-			<input id="srcImg" type="text" class="form-control" placeholder="클릭하여 이미지 파일 찾기.." readonly="readonly"/>
+			<input id="srcImg" type="file" class="form-control" accept="image/gif, image/jpeg, image/png" onchange="chk_file_type(this)"/>
 			<div>
 				<button id="initializeImg" type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal">기본 프로필 사진 사용하기</button>
 				<button id="applyImg" type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">이미지 저장</button>
@@ -36,15 +36,15 @@
 		<!-- 프로필 텍스트 정보 수정 UI 중 type=text만 모아놓은 div -->
 		<div id="settingInfoTextBox">
 			<div id="idAndPw">
-				<input id="userId" type="text" class="form-control" placeholder="아이디" readonly="readonly" value="${ userDataMap.USER_ID }"/>
-				<input id="userPw" type="password" class="form-control" placeholder="변경할 비밀번호"/>
-				<input id="userPwRe" type="password" class="form-control" placeholder="변경할 비밀번호 확인"/>
+				<input id="userId" name="userId" type="text" class="form-control" placeholder="아이디" readonly="readonly" value="${ userDataMap.USER_ID }"/>
+				<input id="userPw" name="userPw" type="password" class="form-control" placeholder="변경할 비밀번호"/>
+				<input id="userPwRe" name="userPwRe" type="password" class="form-control" placeholder="변경할 비밀번호 확인"/>
 			</div>
 			<div id="otherInfo">
-				<input id="userName" type="text" class="form-control" placeholder="성함" readonly="readonly" value="${ userDataMap.USER_NAME }"/>
-				<input id="userEmail" type="text" class="form-control" placeholder="이메일" value="${ userDataMap.USER_EMAIL }"/>
-				<input id="userTel" type="text" class="form-control" placeholder="전화번호" value="${ userDataMap.USER_TEL }"/>
-				<input id="userNickname" type="text" class="form-control" placeholder="닉네임" value="${ userDataMap.USER_NAME }"/>
+				<input id="userName" name="userName" type="text" class="form-control" placeholder="성함" readonly="readonly" value="${ userDataMap.USER_NAME }"/>
+				<input id="userEmail" name="userEmail" type="text" class="form-control" placeholder="이메일" value="${ userDataMap.USER_EMAIL }"/>
+				<input id="userTel" name="userTel" type="text" class="form-control" placeholder="전화번호" value="${ userDataMap.USER_TEL }" maxlength="13"/>
+				<input id="userNick" name="userNick" type="text" class="form-control" placeholder="닉네임" value="${ userDataMap.USER_NICK }"/>
 			</div>
 		</div>
 		<!-- 프로필 텍스트 정보 수정 UI 중 button태그들만 모아놓은 div -->
