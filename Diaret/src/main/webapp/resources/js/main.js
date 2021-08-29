@@ -1,7 +1,11 @@
 $(document).ready(function() {
-	if($("#unvisibleValue").text()) {
-		alert("아이디 혹은 비밀번호가 다릅니다.");
-	}
+
+	//좀 모르겠는데...
+	$("#unvisibleValue").change(function () {
+		if($("#unvisibleValue").text() == "failed") {
+			alert("아이디 혹은 비밀번호가 다릅니다.");
+		}
+	});
 
 	//휠 클릭 시 슬라이드 전환
 	$(".item").on("wheel", function (event){

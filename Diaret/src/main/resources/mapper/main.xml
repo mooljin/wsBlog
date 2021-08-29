@@ -5,7 +5,6 @@
 
 <mapper namespace="main">
 	<select id="selectUser" parameterType="Map" resultType="hashMap">
-		<!-- 들어갈 쿼리문 -->
 		SELECT USER_NUM, USER_ID, USER_PW, USER_NAME, USER_NICK, USER_EMAIL, USER_TEL
       	  FROM USER_INFO
          WHERE USER_ID = #{userId}

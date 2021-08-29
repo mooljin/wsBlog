@@ -54,6 +54,7 @@
 #settingInfoBox {
 	display: flex;
 	flex-direction: column;
+	align-items: center;
 	width: 100%;
 	height: 66%;
 }
@@ -72,11 +73,13 @@
 }
 
 #rightDiv input, #rightDiv button {
+	font-size: 18px!important;
 	margin: 10px;
 }
 
 #settingInfoTextBox {
 	display: flex;
+	justify-content: flex-end;
 	width: 100%;
 	height: 50%;
 	align-items: center;
@@ -93,9 +96,9 @@
 #settingInfoTextBox>div {
 	display: flex;
 	flex-direction: column;
-	justify-content: flex-end;
+	justify-content: flex-start;
 	flex-grow: 1;
-	height: 100%;
+	height: 85%;
 }
 
 #idAndPw {
@@ -110,10 +113,6 @@
 	margin: 5px;
 }
 
-input, button {
-	font-size: 18px!important;
-}
-
 #settingInfoBtnBox {
 	display: flex;
 	width: 42%;
@@ -124,4 +123,9 @@ input, button {
 
 #settingInfoBtnBox button {
 	flex-grow: 1;
+}
+
+#subtitle {
+	width: 41%;
+	text-align: center;
 }

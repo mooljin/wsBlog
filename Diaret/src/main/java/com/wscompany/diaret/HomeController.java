@@ -5,12 +5,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +32,7 @@ public class HomeController {
 
 	@RequestMapping(value = "/")
 	public String goMain() {
-		return "diary";
+		return "main";
 	}
 
 	@RequestMapping(value = "/goJoin.do")
@@ -69,7 +73,7 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "/doLogin.do")
-	public String doLogin(@RequestParam Map<String, String> paramMap, Model model) {
+	public String doLogin(@RequestParam Map<String, String> paramMap, Model model, HttpSession session) {
 		String nextPage = null;
 
 		SqlSessionFactory temp = null;
@@ -83,16 +87,17 @@ public class HomeController {
 
 			if(userDataMap != null) {
 				if(userDataMap.get("USER_PW").equals(paramMap.get("userPw"))) {
-					model.addAttribute("userDataMap", userDataMap);
-					model.addAttribute("loginFailed", "");
+					session.setAttribute("userDataMap", userDataMap);
+					model.addAttribute("includePage", "noPost");
+					model.addAttribute("login", "success");
 					nextPage = "diary";
 				} else {
 					//로그인 실패 시 알람을 띄우기 위한 변수
-					model.addAttribute("loginFailed", "loginFailed");
+					model.addAttribute("login", "failed");
 					nextPage = "main";
 				}
 			} else {
-				model.addAttribute("loginFailed", "loginFailed");
+				model.addAttribute("login", "failed");
 				nextPage = "main";
 			}
 
@@ -143,5 +148,53 @@ public class HomeController {
 			sqlSession.close();
 		}
 		return nextPage;
+	}
+
+	@RequestMapping(value = "/goModify.do")
+	public String goModify(Model model) {
+		model.addAttribute("includePage", "modify");
+
+		return "diary";
+	}
+
+	@RequestMapping(value = "/cancelModify.do")
+	public String cancelModify(Model model) {
+		model.addAttribute("includePage", "noPost");
+
+		return "diary";
+	}
+
+	//"initializeImg.do"
+
+	//"applyImg.do"
+
+	//"doModify.do"
+
+	//"doWithdraw.do"
+	@RequestMapping(value = "/doWithdraw.do")
+	public String doWithdraw(HttpServletRequest request, HttpSession session) {
+		System.out.println("doWithdraw.do");
+		Map<String, Object> userDataMap = (Map<String, Object>) session.getAttribute("userDataMap");
+		String userId = (String) userDataMap.get("USER_ID");
+
+		SqlSessionFactory temp = null;
+		SqlSession sqlSession = null;
+
+		try {
+			temp = sqlSessionFactory.getObject();
+			sqlSession = temp.openSession();
+
+			sqlSession.delete("modify.deleteUser", userId);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			sqlSession.close();
+		}
+
+		session.invalidate();
+		HttpSession newSession = request.getSession(true);
+
+		return "main";
 	}
 }

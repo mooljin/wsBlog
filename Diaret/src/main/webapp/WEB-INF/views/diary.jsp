@@ -8,7 +8,7 @@
 	<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 	<script src="${ pageContext.request.contextPath }/resources/js/ui/jquery.json-2.2.min.js" type="text/javascript"></script>
-	<%-- <script src="${ pageContext.request.contextPath }/resources/js/main.js" type="text/javascript"></script> --%>
+	<script src="${ pageContext.request.contextPath }/resources/js/diary.js" type="text/javascript"></script>
 	<!-- js import end -->
 
 	<!-- css import start -->
@@ -25,14 +25,17 @@
 		<!-- left UI -->
 		<div id="profile">
 			<!-- 닉네임 보여주기 -->
-			<p id="nickname">사탄아저씨</p>
+			<p id="nickname">${ userDataMap.USER_NICK }</p>
 			<div id="alignCenter">
 				<img id="imgProfile" alt="defaultProfile.jpg" src="${ pageContext.request.contextPath }/resources/images/fallguy.jpg">
 			</div>
-			<div id="btnProfile">
-				<button type="button" class="btn btn-danger" id="settings"><i class="bi bi-box-arrow-left"></i></button>
-				<button type="button" class="btn btn" id="modify"><i class="bi bi-gear-fill"></i></button>
-			</div>
+			<!-- 로그아웃, 회원 정보 수정 페이지 이동 버튼 -->
+			<form id="btnForm" method="post">
+				<div id="btnProfile">
+					<button type="button" class="btn btn-danger" id="logout"><i class="bi bi-box-arrow-left"></i></button>
+					<button type="button" class="btn btn" id="modify"><i class="bi bi-gear-fill"></i></button>
+				</div>
+			</form>
 		</div>
 		<div id="fixedLength">
 			<div id="postings">
@@ -115,7 +118,7 @@
 		</div>
 	</div>
 	<div id="rightDiv">
-		<jsp:include page="${ pageContext.request.contextPath }/../WEB-INF/views/modify.jsp"/>
+		<jsp:include page="${ pageContext.request.contextPath }/../WEB-INF/views/${ includePage }.jsp"/>
 	</div>
 </body>
 </html>

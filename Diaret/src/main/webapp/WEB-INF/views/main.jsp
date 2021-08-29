@@ -23,7 +23,7 @@
 	</head>
 
 	<body>
-		<p style="display:none" id="unvisibleValue">${ loginFailed }</p>
+		<p style="display:none" id="unvisibleValue">${ login }</p>
 		<div id="mainDiv">
 			<!-- left UI -->
 			<div id="leftDiv" class="container">
@@ -74,8 +74,8 @@
 			<div id="rightDiv">
 				<p class="alert alert-info inNoteBook">환영합니다.</p>
 				<form action="doLogin.do" method="post" id="loginForm">
-					<input class="form-control inNoteBook" type="text" placeholder="아이디" name="userId" required/>
-					<input class="form-control inNoteBook" type="password" placeholder="비밀번호" name="userPw" required/>
+					<input class="form-control inNoteBook" type="text" placeholder="아이디" name="userId" value="diaret" required/>
+					<input class="form-control inNoteBook" type="password" placeholder="비밀번호" name="userPw" value="diaret2010" required/>
 					<button type="button" class="btn btn-success inNoteBook" id="login">로그인</button>
 					<button type="button" class="btn btn-success inNoteBook" id="join">회원가입</button>
 					<button type="button" class="btn btn-warning inNoteBook" id="kakao">카카오톡으로 로그인</button>

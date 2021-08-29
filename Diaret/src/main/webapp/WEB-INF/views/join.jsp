@@ -21,7 +21,7 @@
 		<title>join.jsp</title>
 	</head>
 	<body>
-		<p class="alert alert-info">모든 항목은 필수 입력 사항입니다.</p>
+		<p class="alert alert-info">모든 항목은 필수 입력 사항입니다.<br>가입 완료 후, 아이디, 성함은 변경이 불가능합니다.</p>
 		<hr>
 		<form method="post" id="joinForm">
 			<input type="text" class="form-control" placeholder="아이디" name="userId" />
