@@ -1,12 +1,18 @@
 package com.wscompany.diaret;
 
-import java.util.Iterator;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Base64;
+import java.util.Base64.Decoder;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.swing.text.Position.Bias;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -14,7 +20,6 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -87,6 +92,7 @@ public class HomeController {
 
 			if(userDataMap != null) {
 				if(userDataMap.get("USER_PW").equals(paramMap.get("userPw"))) {
+					//세션에 현재 로그인한 유저 정보를 등록
 					session.setAttribute("userDataMap", userDataMap);
 					model.addAttribute("includePage", "noPost");
 					model.addAttribute("login", "success");
@@ -166,11 +172,58 @@ public class HomeController {
 
 	//"initializeImg.do"
 
-	//"applyImg.do"
+	@RequestMapping(value = "/applyImg.do")
+	@ResponseBody
+	public String applyImg(@RequestParam Map<String, Object> paramMap, HttpServletRequest request) {
+		System.out.println(paramMap);
+
+		//이미지 디코딩
+		Decoder decoder =  Base64.getDecoder();
+		byte[] binaryImg = decoder.decode((String) paramMap.get("encodedStr"));
+
+		//프로필 이미지 저장할 경로 지정. (프로젝트 내부로 경로를 잡고 싶은데, 잘 안 됨.)
+		String contextPath = request.getContextPath();
+		HttpSession session = request.getSession();
+		int userNum = (Integer) ((Map<String, Object>) session.getAttribute("userDataMap")).get("USER_NUM");
+		String dir = contextPath + "/resources/userData/" + userNum;
+		System.out.println(dir);
+		String file = "temp" + "." + ((String) paramMap.get("exp"));
+		System.out.println(file);
+
+		//프로필 이미지 저장
+		writeToFile(dir, file, binaryImg);
+
+		SqlSessionFactory temp = null;
+		SqlSession sqlSession = null;
+		Map<String, Object> userDataMap = null;
+
+		try {
+			temp = sqlSessionFactory.getObject();
+			sqlSession = temp.openSession();
+
+			Map<String, Object> imgSrc = new HashMap<String, Object>();
+			imgSrc.put("userNum", userNum);
+			imgSrc.put("userImg", dir + "/" + file);
+
+			//이미지 저장 주소 위치를 DB에 저장
+			sqlSession.update("modify.updateImg", imgSrc);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			sqlSession.close();
+		}
+		//세션 정보 갱신
+		String userId = (String) ((Map<String, Object>) session.getAttribute("userDataMap")).get("USER_ID");
+		userDataMap = sqlSession.selectOne("modify.selectAfterUpdate", userId);
+
+		request.getSession().setAttribute("userDataMap", userDataMap);
+		request.setAttribute("includePage", "noPost");
+
+		return "diary";
+	}
 
 	@RequestMapping(value = "/doModify.do")
 	public String doModify(@RequestParam Map<String, Object> paramMap, HttpSession session, HttpServletRequest request) {
-		System.out.println(paramMap);
 		String userPw = (String) paramMap.get("userPw");
 
 		SqlSessionFactory temp = null;
@@ -231,5 +284,42 @@ public class HomeController {
 		request.getSession(true);
 
 		return "main";
+	}
+
+	//인코딩 된 이미지 파일을 디코딩하여 저장
+	public void writeToFile(String dir, String file, byte[] pData) {
+	    if(pData != null){
+	    	if( !(new File(dir).isDirectory()) ) {
+	    		new File(dir).mkdirs();
+	    	}
+
+	    	FileOutputStream lFileOutputStream = null;
+
+	    	try{
+	    		File lOutFile = new File(dir, file);
+	    		lFileOutputStream = new FileOutputStream(lOutFile);
+	    		lFileOutputStream.write(pData);
+
+	    		//여따 저장해도 되는건가..?....
+	    		System.out.println(lOutFile.getAbsolutePath() + "에 저장 완료");
+	    	}catch(IOException e){
+	    		e.printStackTrace();
+	    	} finally {
+	    		try {
+	    			lFileOutputStream.close();
+	    		} catch (IOException e) {
+	    			e.printStackTrace();
+	    		}
+	    	}
+	    }
+	}
+
+	//이미지 파일 불러오기
+	public File readFromFile(String dir, String file) {
+	   		File lInFile = new File(dir, file);
+	   		if(lInFile.exists()) {
+	   			System.out.println(lInFile.getAbsolutePath() + "를 불러옴.");
+	   		}
+	   		return lInFile;
 	}
 }

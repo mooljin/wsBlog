@@ -20,7 +20,7 @@
 	<div id="inputImg">
 		<form id="settingImgForm">
 			<h1 id="title1">프로필 사진 변경</h1>
-			<input id="srcImg" type="file" class="form-control" accept="image/gif, image/jpeg, image/png" onchange="chk_file_type(this)"/>
+			<input id="srcImg" name="srcImg" type="file" class="form-control" accept="image/gif, image/jpeg, image/png" onchange="chk_file_type(this)"/>
 			<div>
 				<button id="initializeImg" type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal">기본 프로필 사진 사용하기</button>
 				<button id="applyImg" type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">이미지 저장</button>

@@ -7,6 +7,7 @@ $(document).ready( function() {
 	var chooseForm = function (form) {
 		$("#userPw").val(btoa($("#userPw").val()));
 		if($("#sessionUserPw").val() == btoa($("#identifyInput").val())) {
+
 			//"저장 버튼을 누르고 모든 사용자 입력값이 조건에 부합할 때 추가로 해야 할 것들
 			if(eventSrc == "doModify") {
 				var data = $(form).serializeObject();
@@ -22,7 +23,39 @@ $(document).ready( function() {
 					async: false,
 					success: function() {
 						alert("수정되었습니다.");
-						$("#settingInfoForm").submit();
+						$(form).submit();
+					}
+				});
+			}
+			//"이미지 저장" 버튼을 누르고 모든 사용자 입력값이 조건에 부합할 때 추가로 해야 할 것들
+			if(eventSrc == "applyImg") {
+				//base64로 인코딩 된 이미지를 가져옴.
+
+				var userImg = $("#imgPreview").attr("src");
+				console.log(userImg);
+				//인코딩 결과 형태 : data:타입/확장자;인코딩방식,매우 많은 인코딩 코드....
+				//예시 : data:image/jpg;base64,bewifvbaweufviurebign2a332tasQ#W%agt#$TaGw34TGt44#WtSAET3a4tgs$...
+				//1. ":" ";" "," 로 split
+				//2. ":" ";" 사이에 있는 "/"로 split
+				var strArray1 = userImg.split(','); // data:image/jpg;base64    bewifvbaweufviurebign2a332tasQ#W%agt#$TaGw34TGt44#WtSAET3a4tgs$...
+				var strArray2 = strArray1[0].split('/'); // data:image    jpg;base64
+				var strArray3 = strArray2[1].split(';'); // jpg    base64
+				var exp = strArray3[0];
+				var encodedStr = strArray1[1];
+				console.log("확장자 : " + exp);
+				console.log("인코딩 된 이미지 : " + encodedStr);
+				//디코딩은 하는데 깨진다. java에서 디코딩을 해야할 듯.. 허.. 막히네.. 딴거 해야지..
+				console.log(atob(encodedStr));
+
+				var data = { "exp" : exp, "encodedStr" : encodedStr };
+				$.ajax({
+					type: 'post',
+					url: 'applyImg.do',
+					data: data,
+					async: false,
+					success: function() {
+						alert("수정되었습니다.");
+//						$(form).submit();
 					}
 				});
 			}
@@ -39,11 +72,6 @@ $(document).ready( function() {
 			//이미지 쪽 본인 확인 후 진행되는 로직
 			chooseForm("#settingImgForm");
 		}
-	});
-
-	//"클릭하여 이미지 파일 찾기.." text 칸 누를 시
-	$("#srcImg").click( function() {
-
 	});
 
 	//"기본 프로필 사진 사용하기" 버튼 누를 시
@@ -132,6 +160,7 @@ $(document).ready( function() {
 });
 
 //첨부파일이 이미지 파일인지 검사
+//이미지 내용이 바뀌었을 때만 onchange 속성을 통해 이 함수를 호출
 function chk_file_type(obj) {
 
 	var file_kind = obj.value.lastIndexOf('.');
