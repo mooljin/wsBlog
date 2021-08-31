@@ -5,7 +5,7 @@
 
 <mapper namespace="join">
   <select id="selectUser" parameterType="Map" resultType="hashMap">
-    SELECT USER_NUM, USER_ID, USER_PW, USER_NAME, USER_NICK, USER_EMAIL, USER_TEL
+    SELECT USER_NUM, USER_ID, USER_PW, USER_NAME, USER_NICK, USER_EMAIL, USER_TEL, USER_IMG
       FROM USER_INFO
      WHERE USER_ID = #{userId}
   </select>

@@ -27,7 +27,8 @@
 			<!-- 닉네임 보여주기 -->
 			<p id="nickname">${ userDataMap.USER_NICK }</p>
 			<div id="alignCenter">
-				<img id="imgProfile" alt="defaultProfile.jpg" src="${ pageContext.request.contextPath }/resources/images/fallguy.jpg">
+				<!-- "${ pageContext.request.contextPath }/resources/images/fallguy.jpg" -->
+				<img id="imgProfile" alt="${ userDataMap.USER_IMG }" src="file:///D:/diaret/resources/userData/4/temp.png">
 			</div>
 			<!-- 로그아웃, 회원 정보 수정 페이지 이동 버튼 -->
 			<form id="btnForm" method="post">
@@ -118,6 +119,7 @@
 		</div>
 	</div>
 	<div id="rightDiv">
+		<%-- <jsp:include page="${ pageContext.request.contextPath }/../WEB-INF/views/${ includePage }.jsp"/> --%>
 		<jsp:include page="${ pageContext.request.contextPath }/../WEB-INF/views/${ includePage }.jsp"/>
 	</div>
 </body>

@@ -6,7 +6,7 @@
 <div>
 	<p class="firstGuideText">wellCome!</p>
 	<p class="firstGuideText">새로운 첫 순간을 기록해 보아요.</p>
-	<form>
-		<button id="btnNewFirstPosting" type="button" class="btn btn-success">새글 작성</button>
+	<form action="goWrite.do">
+		<button id="btnNewFirstPosting" type="submit" class="btn btn-success">새글 작성</button>
 	</form>
 </div>

@@ -9,7 +9,9 @@ import java.util.Base64.Decoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.swing.text.Position.Bias;
@@ -94,7 +96,7 @@ public class HomeController {
 				if(userDataMap.get("USER_PW").equals(paramMap.get("userPw"))) {
 					//세션에 현재 로그인한 유저 정보를 등록
 					session.setAttribute("userDataMap", userDataMap);
-					model.addAttribute("includePage", "noPost");
+					model.addAttribute("includePage", "post");
 					model.addAttribute("login", "success");
 					nextPage = "diary";
 				} else {
@@ -173,9 +175,10 @@ public class HomeController {
 	//"initializeImg.do"
 
 	@RequestMapping(value = "/applyImg.do")
-	@ResponseBody
 	public String applyImg(@RequestParam Map<String, Object> paramMap, HttpServletRequest request) {
-		System.out.println(paramMap);
+		Set<?> pathSet = request.getSession().getServletContext().getResourcePaths("/");
+
+		System.out.println(pathSet);
 
 		//이미지 디코딩
 		Decoder decoder =  Base64.getDecoder();
@@ -185,6 +188,7 @@ public class HomeController {
 		String contextPath = request.getContextPath();
 		HttpSession session = request.getSession();
 		int userNum = (Integer) ((Map<String, Object>) session.getAttribute("userDataMap")).get("USER_NUM");
+//		String dir = application.getRealPath("resources/userData") + "/" + userNum;
 		String dir = contextPath + "/resources/userData/" + userNum;
 		System.out.println(dir);
 		String file = "temp" + "." + ((String) paramMap.get("exp"));
@@ -321,5 +325,14 @@ public class HomeController {
 	   			System.out.println(lInFile.getAbsolutePath() + "를 불러옴.");
 	   		}
 	   		return lInFile;
+	}
+
+	//goWrite.do
+	@RequestMapping(value = "/goWrite.do")
+	public String goWrite(@RequestParam Map<String, Object> paramMap, Model model) {
+		System.out.println(paramMap);
+
+		model.addAttribute("includePage", "writePost");
+		return "diary";
 	}
 }

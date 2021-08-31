@@ -44,7 +44,7 @@ $(document).ready( function() {
 				var encodedStr = strArray1[1];
 				console.log("확장자 : " + exp);
 				console.log("인코딩 된 이미지 : " + encodedStr);
-				//디코딩은 하는데 깨진다. java에서 디코딩을 해야할 듯.. 허.. 막히네.. 딴거 해야지..
+				//디코딩은 하는데 깨진다. java에서 디코딩을 진행함.
 				console.log(atob(encodedStr));
 
 				var data = { "exp" : exp, "encodedStr" : encodedStr };

@@ -1,0 +1,49 @@
+@charset "UTF-8";
+
+/* font imported */
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
+
+#rightDiv * {
+	font-family: 'Nanum Gothic', sans-serif;
+	text-align: left;
+}
+
+#resultTitleBox {
+	background-color: #66b445;
+	width: 100%;
+}
+
+#resultBox {
+	overflow: auto;
+}
+
+.result {
+	display: flex;
+	border: 3px solid #66b445;
+	border-radius: 5px;
+	margin: 1%;
+	width: 98%;
+}
+
+.title, .outline {
+	width: 50%;
+	height: 100%;
+}
+
+#rightDiv h1, #rightDiv p, #rightDiv h3 {
+	margin: 0%;
+	padding: 1%;
+}
+
+#hiddenKeyword {
+	display: none;
+}
+
+.highlight {
+	background-color: #fff1b9;
+}
+
+.result:hover {
+	background-color: #bfdeff;
+	cursor: pointer;
+}
