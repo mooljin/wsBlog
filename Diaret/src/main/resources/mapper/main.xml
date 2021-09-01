@@ -10,7 +10,7 @@
          WHERE USER_ID = #{userId}
 	</select>
 	<select id="loadPostTitles" parameterType="Integer" resultType="hashMap">
-		SELECT POST_CATEGORY, POST_TITLE
+		SELECT POST_CATEGORY, POST_TITLE, POST_NUM
 		  FROM POST_INFO
 		 WHERE POST_USER_NUM = #{postUserNum}
 	</select>

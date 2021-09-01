@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!-- js import start -->
 <script src="${ pageContext.request.contextPath }/resources/js/modify.js" type="text/javascript"></script>
 <!-- js import end -->
@@ -13,7 +14,14 @@
 	<!-- 설정된 이미지가 뜨는 div -->
 	<div id="imgBox">
 		<div id="square">
-			<img id="imgPreview" alt="defaultProfile.jpg" src="/diaret/resources/userData/${ userDataMap.USER_NUM }/profile.${ userDataMap.USER_IMG_EXP }">
+			<c:choose>
+				<c:when test="${ empty userDataMap.USER_IMG_EXP }">
+					<img id="imgProfile" alt="${ userDataMap }" src="${ pageContext.request.contextPath }/resources/images/defaultProfile.jpg">
+				</c:when>
+				<c:otherwise>
+					<img id="imgProfile" alt="errorDir" src="/diaret/resources/userData/${ userDataMap.USER_NUM }/profile.${ userDataMap.USER_IMG_EXP }">
+				</c:otherwise>
+			</c:choose>
 		</div>
 	</div>
 	<!-- 이미지 관련 버튼만 모아놓은 div -->

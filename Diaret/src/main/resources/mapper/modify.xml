@@ -40,4 +40,9 @@
 		   SET USER_IMG_EXP = #{userImgExp}
 		 WHERE USER_NUM = #{userNum}
 	</update>
+	<update id="initializeImg" parameterType="Integer">
+		UPDATE USER_INFO
+		   SET USER_IMG_EXP = NULL
+		 WHERE USER_NUM = #{userNum}
+	</update>
 </mapper>

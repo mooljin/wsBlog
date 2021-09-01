@@ -138,3 +138,7 @@ input[name="search"] {
 .fontSize18 {
 	font-size: 20px!important;
 }
+
+.postEvent:hover {
+	cursor: pointer;
+}

@@ -28,7 +28,14 @@
 			<p id="nickname">${ userDataMap.USER_NICK }</p>
 			<div id="alignCenter">
 				<!-- "${ pageContext.request.contextPath }/resources/images/fallguy.jpg" -->
-				<img id="imgProfile" alt="${ userDataMap }" src="/diaret/resources/userData/${ userDataMap.USER_NUM }/profile.${ userDataMap.USER_IMG_EXP }">
+				<c:choose>
+					<c:when test="${ empty userDataMap.USER_IMG_EXP }">
+						<img id="imgProfile" alt="${ userDataMap }" src="${ pageContext.request.contextPath }/resources/images/defaultProfile.jpg">
+					</c:when>
+					<c:otherwise>
+						<img id="imgProfile" alt="errorDir" src="/diaret/resources/userData/${ userDataMap.USER_NUM }/profile.${ userDataMap.USER_IMG_EXP }">
+					</c:otherwise>
+				</c:choose>
 			</div>
 			<!-- 로그아웃, 회원 정보 수정 페이지 이동 버튼 -->
 			<form id="btnForm" method="post">
@@ -46,15 +53,15 @@
 					<c:forEach items="${ classifiedPostData }" var="category" varStatus="status">
 						<div class="panel-heading">
 							<h4 class="panel-title">
-							<a class="fontSize18" data-toggle="collapse" data-parent="#accordion" href="#collapse${ status.count }">
-								<i class="bi bi-folder-fill"></i> ${ category.key }
-							</a>
+								<a class="fontSize18" data-toggle="collapse" data-parent="#accordion" href="#collapse${ status.count }">
+									<i class="bi bi-folder-fill"></i> ${ category.key }
+								</a>
 							</h4>
 						</div>
 						<div id="collapse${ status.count }" class="panel-collapse collapse">
 							<div class="panel-body">
 								<c:forEach items="${ category.value }" var="post">
-									<p><i class="bi bi-file-earmark-fill"></i> ${ post } </p>
+									<p class="postEvent" id="postNo.${ post.key }"><i class="bi bi-file-earmark-fill"></i> ${ post.value } </p>
 								</c:forEach>
 							</div>
 						</div>

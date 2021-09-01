@@ -95,35 +95,37 @@ public class HomeController {
 			//세션에 설정할 유저 데이터
 			Map<String, Object> userDataMap = sqlSession.selectOne("main.selectUser", paramMap);
 
-			//diary.jsp에서 보여줄 게시글 목록 데이터
-			List<Object> postDataList = sqlSession.selectList("main.loadPostTitles", (Integer) userDataMap.get("USER_NUM"));
-
-			//diary.jsp에서 보여줄 카테고리 데이터
-			List<Object> categoryList = sqlSession.selectList("main.loadCategories", (Integer) userDataMap.get("USER_NUM"));
-			System.out.println(categoryList);
-
-			//카테고리에 따라 게시글 분류
-			HashMap<String, List<String>> classifiedPostData = new HashMap<String, List<String>>();
-
-			for(int i=0; i < categoryList.size(); i++) {
-				String category = (String) categoryList.get(i);
-				classifiedPostData.put(category, new ArrayList<String>());
-				for(int j=0; j < postDataList.size(); j++) {
-					Map<String, String> post = (Map<String, String>) postDataList.get(j);
-					if(post.get("POST_CATEGORY").equals(category)) {
-						classifiedPostData.get(category).add(post.get("POST_TITLE"));
-					}
-				}
-			}
-
-			System.out.println(classifiedPostData);
-
 			if(userDataMap != null) {
 				if(userDataMap.get("USER_PW").equals(paramMap.get("userPw"))) {
+					//로그인 성공 시
+
+					//diary.jsp에서 보여줄 게시글 목록 데이터
+					//list(map POST_CATEGORY, POST_TITLE, POST_NUM)
+					List<Object> postDataList = sqlSession.selectList("main.loadPostTitles", (Integer) userDataMap.get("USER_NUM"));
+
+					//diary.jsp에서 보여줄 카테고리 데이터
+					List<Object> categoryList = sqlSession.selectList("main.loadCategories", (Integer) userDataMap.get("USER_NUM"));
+					System.out.println(categoryList);
+
+					//카테고리에 따라 게시글 분류
+					HashMap<String, HashMap<Integer, String>> classifiedPostData = new HashMap<String, HashMap<Integer, String>>();
+
+					for(int i=0; i < categoryList.size(); i++) {
+						String category = (String) categoryList.get(i);
+						classifiedPostData.put(category, new HashMap<Integer, String>());
+						HashMap<Integer, String> postsInCategory = classifiedPostData.get(category);
+						for(int j=0; j < postDataList.size(); j++) {
+							Map<String, Object> post = (Map<String, Object>) postDataList.get(j);
+							if(((String) post.get("POST_CATEGORY")).equals(category)) {
+								postsInCategory.put((Integer) post.get("POST_NUM"), (String) post.get("POST_TITLE"));
+							}
+						}
+					}
+
 					//세션에 현재 로그인한 유저 정보를 등록
 					session.setAttribute("userDataMap", userDataMap);
 
-					model.addAttribute("classifiedPostData", classifiedPostData);
+					session.setAttribute("classifiedPostData", classifiedPostData);
 
 					if(postDataList == null || postDataList.size() == 0) {
 						//보유 중인 게시글이 없으면 새 글 작성 안내 페이지로 이동
@@ -131,17 +133,18 @@ public class HomeController {
 					} else {
 						//보유 중인 게시글이 있으면 가장 최신 게시글을 보여줌.
 						Map<String, Object> latestPost = sqlSession.selectOne("main.loadLatestPost", userDataMap.get("USER_NUM"));
-						model.addAttribute("latestPost", latestPost);
+						model.addAttribute("focusedPost", latestPost);
 						model.addAttribute("includePage", "post");
 					}
 					model.addAttribute("login", "success");
 					nextPage = "diary";
 				} else {
-					//로그인 실패 시 알람을 띄우기 위한 변수
+					//비밀번호 불일치로 로그인 실패 시 알람을 띄우기 위한 변수
 					model.addAttribute("login", "failed");
 					nextPage = "main";
 				}
 			} else {
+				//존재하지 않는 아이디로 로그인 실패 시 알람을 띄우기 위한 변수
 				model.addAttribute("login", "failed");
 				nextPage = "main";
 			}
@@ -209,7 +212,33 @@ public class HomeController {
 		return "diary";
 	}
 
-	//"initializeImg.do"
+	@RequestMapping(value = "/initializeImg.do")
+	public String initializeImg(Model model, HttpSession session) {
+
+		SqlSessionFactory temp = null;
+		SqlSession sqlSession = null;
+
+		try {
+			temp = sqlSessionFactory.getObject();
+			sqlSession = temp.openSession();
+
+			Map<String, Object> userDataMap = (Map<String, Object>) session.getAttribute("userDataMap");
+
+			sqlSession.update("modify.initializeImg", (Integer) userDataMap.get("USER_NUM"));
+
+			//세션 정보 갱신
+			String userId = (String) userDataMap.get("USER_ID");
+			userDataMap = sqlSession.selectOne("modify.selectAfterUpdate", userId);
+
+			session.setAttribute("userDataMap", userDataMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		model.addAttribute("includePage", "noPost");
+
+		return "diary";
+	}
 
 	@RequestMapping(value = "/applyImg.do")
 	public String applyImg(@RequestParam Map<String, Object> paramMap, HttpServletRequest request) {
@@ -328,7 +357,6 @@ public class HomeController {
 		return "main";
 	}
 
-	//goWrite.do
 	@RequestMapping(value = "/goWrite.do")
 	public String goWrite(@RequestParam Map<String, Object> paramMap, Model model) {
 		System.out.println("몇 번 들어오냐?");
@@ -338,6 +366,13 @@ public class HomeController {
 		model.addAttribute("content", paramMap.get("content"));
 
 		model.addAttribute("includePage", "writePost");
+		return "diary";
+	}
+
+	@RequestMapping(value = "/goPost.do")
+	public String goPost(@RequestParam Map<String, Object> paramMap, Model model) {
+		//게시글 검색, 또는 좌측 목록에서 게시글을 누르면 해당 게시글로 이동
+
 		return "diary";
 	}
 

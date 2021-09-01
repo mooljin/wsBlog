@@ -8,10 +8,10 @@
 <!-- css import end -->
 <!-- top UI -->
 <div id="topDiv">
-	<p id="categoryTitle"><i class="bi bi-folder-fill"></i>${ latestPost.POST_CATEGORY }</p>
-	<p id="postTitle">${ latestPost.POST_TITLE }</p>
+	<p id="categoryTitle"><i class="bi bi-folder-fill"></i>${focusedPost.POST_CATEGORY }</p>
+	<p id="postTitle">${ focusedPost.POST_TITLE }</p>
 	<div id="displayFlex">
-		<p id="postDate">${ latestPost.POST_DATE }</p>
+		<p id="postDate">${ focusedPost.POST_DATE }</p>
 		<form id="postOptionForm" autocomplete="off">
 			<button id="newPost" type="button" class="btn btn-success">새 글</button>
 			<button id="modifyPost" type="button" class="btn btn-success">수정</button>
@@ -24,5 +24,7 @@
 	<!-- 게시글 내용 불러오기. -->
 	<!-- "${ pageContext.request.contextPath }/../resources/userData/${ userDataMap.USER_NUM }/posts/1.jsp"와 -->
 	<!-- "${ pageContext.request.contextPath }/userData/${ userDataMap.USER_NUM }/posts/1.jsp" 의 차이? -->
-	<jsp:include page="${ pageContext.request.contextPath }/../resources/userData/${ latestPost.POST_USER_NUM }/posts/${ latestPost.POST_NUM }.jsp"/>
+
+	<!-- 아래는 최종 버전 -->
+	<%-- <jsp:include page="${ pageContext.request.contextPath }/../resources/userData/${ focusedPost.POST_USER_NUM }/posts/${ focusedPost.POST_NUM }.jsp"/> --%>
 </div>

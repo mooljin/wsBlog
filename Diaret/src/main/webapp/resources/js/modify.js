@@ -42,7 +42,6 @@ $(document).ready( function() {
 				var exp = strArray3[0];
 				var encodedStr = strArray1[1];
 				//디코딩은 하는데 깨진다. java에서 디코딩을 진행함.
-				console.log(atob(encodedStr));
 
 				var data = { "exp" : exp, "encodedStr" : encodedStr };
 				$.ajax({
@@ -55,6 +54,11 @@ $(document).ready( function() {
 //						$(form).submit();
 					}
 				});
+			}
+
+			if(eventSrc == "initializeImg") {
+				alert("수정되었습니다.");
+				$(form).submit();
 			}
 		} else {
 			alert("비밀번호가 다릅니다.");

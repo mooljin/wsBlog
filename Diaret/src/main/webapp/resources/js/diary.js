@@ -14,4 +14,9 @@ $(document).ready( function() {
 		$("#btnForm").submit();
 	});
 
+	$(".postEvent").each( function(index, item) {
+		$(item).click(function() {
+			location.href = "goPost.do?" + $(item).attr("id").split(".")[1];
+		});
+	});
 });
