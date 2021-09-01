@@ -4,12 +4,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -90,13 +92,48 @@ public class HomeController {
 			temp = sqlSessionFactory.getObject();
 			sqlSession = temp.openSession();
 
+			//세션에 설정할 유저 데이터
 			Map<String, Object> userDataMap = sqlSession.selectOne("main.selectUser", paramMap);
+
+			//diary.jsp에서 보여줄 게시글 목록 데이터
+			List<Object> postDataList = sqlSession.selectList("main.loadPostTitles", (Integer) userDataMap.get("USER_NUM"));
+
+			//diary.jsp에서 보여줄 카테고리 데이터
+			List<Object> categoryList = sqlSession.selectList("main.loadCategories", (Integer) userDataMap.get("USER_NUM"));
+			System.out.println(categoryList);
+
+			//카테고리에 따라 게시글 분류
+			HashMap<String, List<String>> classifiedPostData = new HashMap<String, List<String>>();
+
+			for(int i=0; i < categoryList.size(); i++) {
+				String category = (String) categoryList.get(i);
+				classifiedPostData.put(category, new ArrayList<String>());
+				for(int j=0; j < postDataList.size(); j++) {
+					Map<String, String> post = (Map<String, String>) postDataList.get(j);
+					if(post.get("POST_CATEGORY").equals(category)) {
+						classifiedPostData.get(category).add(post.get("POST_TITLE"));
+					}
+				}
+			}
+
+			System.out.println(classifiedPostData);
 
 			if(userDataMap != null) {
 				if(userDataMap.get("USER_PW").equals(paramMap.get("userPw"))) {
 					//세션에 현재 로그인한 유저 정보를 등록
 					session.setAttribute("userDataMap", userDataMap);
-					model.addAttribute("includePage", "post");
+
+					model.addAttribute("classifiedPostData", classifiedPostData);
+
+					if(postDataList == null || postDataList.size() == 0) {
+						//보유 중인 게시글이 없으면 새 글 작성 안내 페이지로 이동
+						model.addAttribute("includePage", "noPost");
+					} else {
+						//보유 중인 게시글이 있으면 가장 최신 게시글을 보여줌.
+						Map<String, Object> latestPost = sqlSession.selectOne("main.loadLatestPost", userDataMap.get("USER_NUM"));
+						model.addAttribute("latestPost", latestPost);
+						model.addAttribute("includePage", "post");
+					}
 					model.addAttribute("login", "success");
 					nextPage = "diary";
 				} else {
@@ -191,7 +228,7 @@ public class HomeController {
 //		String dir = application.getRealPath("resources/userData") + "/" + userNum;
 		String dir = contextPath + "/resources/userData/" + userNum;
 		System.out.println(dir);
-		String file = "temp" + "." + ((String) paramMap.get("exp"));
+		String file = "profile" + "." + ((String) paramMap.get("exp"));
 		System.out.println(file);
 
 		//프로필 이미지 저장
@@ -207,10 +244,10 @@ public class HomeController {
 
 			Map<String, Object> imgSrc = new HashMap<String, Object>();
 			imgSrc.put("userNum", userNum);
-			imgSrc.put("userImg", dir + "/" + file);
+			imgSrc.put("userImgExp", dir + "/" + file);
 
 			//이미지 저장 주소 위치를 DB에 저장
-			sqlSession.update("modify.updateImg", imgSrc);
+			sqlSession.update("modify.updateImg", paramMap.get("exp"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -276,6 +313,7 @@ public class HomeController {
 			sqlSession.close();
 		}
 
+		//세션 만료가 안됨.
 		request.getSession().invalidate();
 		request.getSession(true);
 
@@ -288,6 +326,19 @@ public class HomeController {
 		request.getSession(true);
 
 		return "main";
+	}
+
+	//goWrite.do
+	@RequestMapping(value = "/goWrite.do")
+	public String goWrite(@RequestParam Map<String, Object> paramMap, Model model) {
+		System.out.println("몇 번 들어오냐?");
+		System.out.println(paramMap);
+		model.addAttribute("category", paramMap.get("category"));
+		model.addAttribute("title", paramMap.get("title"));
+		model.addAttribute("content", paramMap.get("content"));
+
+		model.addAttribute("includePage", "writePost");
+		return "diary";
 	}
 
 	//인코딩 된 이미지 파일을 디코딩하여 저장
@@ -316,23 +367,5 @@ public class HomeController {
 	    		}
 	    	}
 	    }
-	}
-
-	//이미지 파일 불러오기
-	public File readFromFile(String dir, String file) {
-	   		File lInFile = new File(dir, file);
-	   		if(lInFile.exists()) {
-	   			System.out.println(lInFile.getAbsolutePath() + "를 불러옴.");
-	   		}
-	   		return lInFile;
-	}
-
-	//goWrite.do
-	@RequestMapping(value = "/goWrite.do")
-	public String goWrite(@RequestParam Map<String, Object> paramMap, Model model) {
-		System.out.println(paramMap);
-
-		model.addAttribute("includePage", "writePost");
-		return "diary";
 	}
 }

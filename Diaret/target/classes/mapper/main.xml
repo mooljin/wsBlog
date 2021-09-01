@@ -5,8 +5,24 @@
 
 <mapper namespace="main">
 	<select id="selectUser" parameterType="Map" resultType="hashMap">
-		SELECT USER_NUM, USER_ID, USER_PW, USER_NAME, USER_NICK, USER_EMAIL, USER_TEL, USER_IMG
+		SELECT USER_NUM, USER_ID, USER_PW, USER_NAME, USER_NICK, USER_EMAIL, USER_TEL, USER_IMG_EXP
       	  FROM USER_INFO
          WHERE USER_ID = #{userId}
+	</select>
+	<select id="loadPostTitles" parameterType="Integer" resultType="hashMap">
+		SELECT POST_CATEGORY, POST_TITLE
+		  FROM POST_INFO
+		 WHERE POST_USER_NUM = #{postUserNum}
+	</select>
+	<select id="loadCategories" parameterType="Integer" resultType="String">
+		SELECT DISTINCT POST_CATEGORY
+		  FROM POST_INFO
+		 WHERE POST_USER_NUM = #{postUserNum}
+	</select>
+	<select id="loadLatestPost" parameterType="Integer" resultType="hashMap">
+		SELECT POST_NUM, POST_CATEGORY, POST_TITLE, POST_DATE, POST_USER_NUM, POST_KEYWORDS
+		  FROM POST_INFO
+		 WHERE POST_USER_NUM = #{postUserNum}
+	  ORDER BY POST_DATE DESC limit 1;
 	</select>
 </mapper>

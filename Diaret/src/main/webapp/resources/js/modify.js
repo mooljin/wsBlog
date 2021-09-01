@@ -32,7 +32,6 @@ $(document).ready( function() {
 				//base64로 인코딩 된 이미지를 가져옴.
 
 				var userImg = $("#imgPreview").attr("src");
-				console.log(userImg);
 				//인코딩 결과 형태 : data:타입/확장자;인코딩방식,매우 많은 인코딩 코드....
 				//예시 : data:image/jpg;base64,bewifvbaweufviurebign2a332tasQ#W%agt#$TaGw34TGt44#WtSAET3a4tgs$...
 				//1. ":" ";" "," 로 split
@@ -42,8 +41,6 @@ $(document).ready( function() {
 				var strArray3 = strArray2[1].split(';'); // jpg    base64
 				var exp = strArray3[0];
 				var encodedStr = strArray1[1];
-				console.log("확장자 : " + exp);
-				console.log("인코딩 된 이미지 : " + encodedStr);
 				//디코딩은 하는데 깨진다. java에서 디코딩을 진행함.
 				console.log(atob(encodedStr));
 

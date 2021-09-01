@@ -13,7 +13,7 @@
 	<!-- 설정된 이미지가 뜨는 div -->
 	<div id="imgBox">
 		<div id="square">
-			<img id="imgPreview" alt="defaultProfile.jpg" src="${ pageContext.request.contextPath }/resources/images/fallguy.jpg" width="100" height="100">
+			<img id="imgPreview" alt="defaultProfile.jpg" src="/diaret/resources/userData/${ userDataMap.USER_NUM }/profile.${ userDataMap.USER_IMG_EXP }">
 		</div>
 	</div>
 	<!-- 이미지 관련 버튼만 모아놓은 div -->

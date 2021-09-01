@@ -28,7 +28,7 @@
 			<p id="nickname">${ userDataMap.USER_NICK }</p>
 			<div id="alignCenter">
 				<!-- "${ pageContext.request.contextPath }/resources/images/fallguy.jpg" -->
-				<img id="imgProfile" alt="${ userDataMap.USER_IMG }" src="file:///D:/diaret/resources/userData/4/temp.png">
+				<img id="imgProfile" alt="${ userDataMap }" src="/diaret/resources/userData/${ userDataMap.USER_NUM }/profile.${ userDataMap.USER_IMG_EXP }">
 			</div>
 			<!-- 로그아웃, 회원 정보 수정 페이지 이동 버튼 -->
 			<form id="btnForm" method="post">
@@ -42,62 +42,23 @@
 			<div id="postings">
 				<!-- 카테고리 및 게시글 목록 보이기 -->
 				<div class="container">
-					<div class="panel-heading">
-						<h4 class="panel-title">
-						<a class="fontSize18" data-toggle="collapse" data-parent="#accordion" href="#collapse1">
-							<i class="bi bi-folder-fill"></i> 카테고리 샘플
-						</a>
-						</h4>
-					</div>
-					<div id="collapse1" class="panel-collapse collapse in">
-						<div class="panel-body">
-							<p><i class="bi bi-file-earmark-fill"></i> 게시글1 </p>
-							<p><i class="bi bi-file-earmark-fill"></i> 게시글2 </p>
-							<p><i class="bi bi-file-earmark-fill"></i> 게시글3 </p>
+
+					<c:forEach items="${ classifiedPostData }" var="category" varStatus="status">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+							<a class="fontSize18" data-toggle="collapse" data-parent="#accordion" href="#collapse${ status.count }">
+								<i class="bi bi-folder-fill"></i> ${ category.key }
+							</a>
+							</h4>
 						</div>
-					</div>
-					<div class="panel-heading">
-						<h4 class="panel-title">
-						<a class="fontSize18" data-toggle="collapse" data-parent="#accordion" href="#collapse2">
-							<i class="bi bi-folder-fill"></i> Left 4 Dead
-						</a>
-						</h4>
-					</div>
-					<div id="collapse2" class="panel-collapse collapse">
-						<div class="panel-body">
-							<p><i class="bi bi-file-earmark-fill"></i> 게시글4 </p>
-							<p><i class="bi bi-file-earmark-fill"></i> 게시글5 </p>
-							<p><i class="bi bi-file-earmark-fill"></i> 게시글6 </p>
+						<div id="collapse${ status.count }" class="panel-collapse collapse">
+							<div class="panel-body">
+								<c:forEach items="${ category.value }" var="post">
+									<p><i class="bi bi-file-earmark-fill"></i> ${ post } </p>
+								</c:forEach>
+							</div>
 						</div>
-					</div>
-					<div class="panel-heading">
-						<h4 class="panel-title">
-						<a class="fontSize18" data-toggle="collapse" data-parent="#accordion" href="#collapse3">
-							<i class="bi bi-folder-fill"></i> 디아블로
-						</a>
-						</h4>
-					</div>
-					<div id="collapse3" class="panel-collapse collapse">
-						<div class="panel-body">
-							<p><i class="bi bi-file-earmark-fill"></i> Posting 4 </p>
-							<p><i class="bi bi-file-earmark-fill"></i> 게시글5 </p>
-							<p><i class="bi bi-file-earmark-fill"></i> 게시글6 </p>
-						</div>
-					</div>
-					<div class="panel-heading">
-						<h4 class="panel-title">
-						<a class="fontSize18" data-toggle="collapse" data-parent="#accordion" href="#collapse4">
-							<i class="bi bi-folder-fill"></i> 워프레임
-						</a>
-						</h4>
-					</div>
-					<div id="collapse4" class="panel-collapse collapse">
-						<div class="panel-body">
-							<p><i class="bi bi-file-earmark-fill"></i> 게시글4 </p>
-							<p><i class="bi bi-file-earmark-fill"></i> 게시글5 </p>
-							<p><i class="bi bi-file-earmark-fill"></i> 게시글6 </p>
-						</div>
-					</div>
+					</c:forEach>
 				</div>
 			</div>
 		</div>

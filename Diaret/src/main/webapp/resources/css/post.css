@@ -28,6 +28,10 @@
 
 #displayFlex {
 	display: flex;
+}
+
+#postOptionForm {
+	display: flex;
 	align-items: baseline;
 }
 
@@ -65,5 +69,9 @@
 
 #bottomDiv * {
 	margin-top: 10px;
+	margin-left: 10px;
+}
+
+#postOptionForm button {
 	margin-left: 10px;
 }

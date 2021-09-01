@@ -10,7 +10,6 @@
 <!-- css import end -->
 
 <!-- 페이지 제목 및 저장 버튼 부분 -->
-<span>${ content }</span>
 <div id="editor-menu1" class="editor-menu">
 	<h1>게시글 작성</h1>
 	<div>
@@ -19,9 +18,9 @@
 </div>
 <!-- 제목 및 카테고리 설정 부분 -->
 <div id="editor-title">
-	<input id="title" name="title" class="form-control" type="text" placeholder="글 제목"/>
+	<input id="title" name="title" class="form-control" type="text" placeholder="글 제목" value="${ title }"/>
 	<div class="btn-group" id="category">
-		<input id="categoryInput" type="text" class="form-control dropdown-toggle" data-toggle="dropdown" placeholder="카테고리(직접 입력 시 새로운 카테고리 생성)"/>
+		<input id="categoryInput" type="text" class="form-control dropdown-toggle" data-toggle="dropdown" placeholder="카테고리(직접 입력 시 새로운 카테고리 생성)" value="${ category }"/>
 		<ul class="dropdown-menu" role="menu">
 			<li class="writeCategory">카테고리1</li>
 			<li class="writeCategory">카테고리2</li>
@@ -46,4 +45,5 @@
 </div>
 <!-- 에디터 영역 : 편집이 가능한 div -->
 <div id="editor" contenteditable="true">
+	${ content }
 </div>

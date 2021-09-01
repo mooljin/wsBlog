@@ -31,13 +31,13 @@
 	그러므로 키 표기법을 맞추기 위해 회원 정보를 수정한 이후의 회원 정보를 다시 불러와서 적용하는 꼼수를 사용.
 	 -->
 	<select id="selectAfterUpdate" parameterType="String" resultType="hashMap">
-		SELECT USER_NUM, USER_ID, USER_PW, USER_NAME, USER_NICK, USER_EMAIL, USER_TEL, USER_IMG
+		SELECT USER_NUM, USER_ID, USER_PW, USER_NAME, USER_NICK, USER_EMAIL, USER_TEL, USER_IMG_EXP
       	  FROM USER_INFO
          WHERE USER_ID = #{userId}
 	</select>
 	<update id="updateImg" parameterType="Map">
 		UPDATE USER_INFO
-		   SET USER_IMG = #{userImg}
+		   SET USER_IMG_EXP = #{userImgExp}
 		 WHERE USER_NUM = #{userNum}
 	</update>
 </mapper>
