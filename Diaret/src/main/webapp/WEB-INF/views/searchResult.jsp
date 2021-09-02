@@ -21,10 +21,10 @@
 		</c:otherwise>
 	</c:choose>
 </div>
-<div id="resultBox">
+<div id="wholeResultBox">
 	<c:forEach items="${ postDataMap }" var="post">
-		<div id="resultBox">
-			<div class="result">
+		<div class="resultBox">
+			<div class="result" id="searchNo.${ post.POST_NUM }">
 				<div class="title">
 					<p>${ post.POST_CATEGORY }</p>
 					<h3 class="resultTitle">${ post.POST_TITLE }</h3>

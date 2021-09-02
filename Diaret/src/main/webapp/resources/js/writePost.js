@@ -62,6 +62,7 @@ $(document).ready(function() {
 		imageSelector.click();
 	});
 
+	//기존에 있던 카테고리를 누르면 값이 변함.
 	categories.each(function(index, item) {
 		item.addEventListener('click', function() {
 			$("#categoryInput").val($(item).text());

@@ -59,7 +59,7 @@
 					</ul>
 				</div>
 				<div id="inlineElements">
-					<input type="text" class="form-control" name="postKeywords" placeholder="제목 또는 내용으로 검색"/>
+					<input type="text" class="form-control" name="postKeywords" placeholder="제목 또는 내용으로 검색" required/>
 					<button type="submit" class="btn btn-info" id="submit">검색</button>
 				</div>
 			</form>
@@ -68,14 +68,21 @@
 			<div id="postings">
 				<!-- 카테고리 및 게시글 목록 보이기 -->
 				<div class="container">
-
 					<c:forEach items="${ classifiedPostData }" var="category" varStatus="status">
 						<div class="panel-heading">
-							<h4 class="panel-title">
-								<a class="fontSize18" data-toggle="collapse" data-parent="#accordion" href="#collapse${ status.count }">
-									<i class="bi bi-folder-fill"></i> ${ category.key }
+							<div>
+								<a class="fontSize18" data-toggle="collapse" data-parent="#accordion" href="#collapse${ status.count }" >
+									<i class='bi bi-folder-fill'></i>${ category.key }
 								</a>
-							</h4>
+							</div>
+							<div class="btnEditCategory1" hidden="true">
+								<button class="btn btn-info editCategory" type="button"><i class="bi bi-pencil-square"></i></button>
+								<button class="btn btn-warning deleteCategory" type="button"><i class="bi bi-trash-fill"></i></button>
+							</div>
+							<div class="btnEditCategory2" hidden="true">
+								<button class="btn btn-success editSubmit" type="button"><i class="bi bi-check2-square"></i></button>
+								<button class="btn btn-danger editCancel" type="button"><i class="bi bi-x-square"></i></button>
+							</div>
 						</div>
 						<div id="collapse${ status.count }" class="panel-collapse collapse">
 							<div class="panel-body">

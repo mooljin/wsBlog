@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Base64.Decoder;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,35 +100,17 @@ public class HomeController {
 				if(userDataMap.get("USER_PW").equals(paramMap.get("userPw"))) {
 					//로그인 성공 시
 
-					//diary.jsp에서 보여줄 게시글 목록 데이터
-					//list(map POST_CATEGORY, POST_TITLE, POST_NUM)
-					List<Object> postDataList = sqlSession.selectList("main.loadPostTitles", (Integer) userDataMap.get("USER_NUM"));
-
-					//diary.jsp에서 보여줄 카테고리 데이터
-					List<Object> categoryList = sqlSession.selectList("main.loadCategories", (Integer) userDataMap.get("USER_NUM"));
-					System.out.println(categoryList);
-
-					//카테고리에 따라 게시글 분류
-					HashMap<String, HashMap<Integer, String>> classifiedPostData = new HashMap<String, HashMap<Integer, String>>();
-
-					for(int i=0; i < categoryList.size(); i++) {
-						String category = (String) categoryList.get(i);
-						classifiedPostData.put(category, new HashMap<Integer, String>());
-						HashMap<Integer, String> postsInCategory = classifiedPostData.get(category);
-						for(int j=0; j < postDataList.size(); j++) {
-							Map<String, Object> post = (Map<String, Object>) postDataList.get(j);
-							if(((String) post.get("POST_CATEGORY")).equals(category)) {
-								postsInCategory.put((Integer) post.get("POST_NUM"), (String) post.get("POST_TITLE"));
-							}
-						}
-					}
+					updatePostAndCategoryInSession(sqlSession, userDataMap, session);
 
 					//세션에 현재 로그인한 유저 정보를 등록
 					session.setAttribute("userDataMap", userDataMap);
 
-					session.setAttribute("classifiedPostData", classifiedPostData);
+					//key : postCategory
+					//value : 카테고리에 소속된 post : postCategory, postNum, postTitle
+					HashMap<String, HashMap<Integer, String>> classifiedPostData = (HashMap<String, HashMap<Integer, String>>) session.getAttribute("classifiedPostData");
+					Collection<HashMap<Integer, String>> posts = classifiedPostData.values();
 
-					if(postDataList == null || postDataList.size() == 0) {
+					if(posts == null || posts.size() == 0) {
 						//보유 중인 게시글이 없으면 새 글 작성 안내 페이지로 이동
 						model.addAttribute("includePage", "noPost");
 					} else {
@@ -372,27 +355,28 @@ public class HomeController {
 	@RequestMapping(value = "/goPost.do")
 	public String goPost(HttpServletRequest request) {
 		//게시글 검색, 또는 좌측 목록에서 게시글을 누르면 해당 게시글로 이동
-		System.out.println(request.getParameter("postNum"));
 
 		SqlSessionFactory temp = null;
 		SqlSession sqlSession = null;
+		Map<String, Object> postDataMap = null;
 
 		try {
 			temp = sqlSessionFactory.getObject();
 			sqlSession = temp.openSession();
 
-			Map<String, Object> postDataMap = sqlSession.selectOne("diary.loadPost", Integer.parseInt(request.getParameter("postNum")));
+			postDataMap = sqlSession.selectOne("diary.loadPost", Integer.parseInt(request.getParameter("postNum")));
 			System.out.println(postDataMap);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		request.setAttribute("focusedPost", postDataMap);
 		request.setAttribute("includePage", "post");
 
 		return "diary";
 	}
 
 	@RequestMapping(value = "/goSearch.do")
-	public String goSearch(@RequestParam Map<String, Object> paramMap, Model model) {
+	public String goSearch(@RequestParam Map<String, Object> paramMap, Model model, HttpSession session) {
 		//게시글 검색, 또는 좌측 목록에서 게시글을 누르면 해당 게시글로 이동
 
 		SqlSessionFactory temp = null;
@@ -401,9 +385,10 @@ public class HomeController {
 		try {
 			temp = sqlSessionFactory.getObject();
 			sqlSession = temp.openSession();
+			Map<String, Object> userDataMap = (Map<String, Object>) session.getAttribute("userDataMap");
+			paramMap.put("postUserNum", userDataMap.get("USER_NUM"));
 
 			postDataMap = sqlSession.selectList("diary.searchPost", paramMap);
-			System.out.println(postDataMap);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -412,6 +397,62 @@ public class HomeController {
 		model.addAttribute("includePage", "searchResult");
 
 		return "diary";
+	}
+
+	@RequestMapping(value = "/modifyCategory.do")
+	@ResponseBody
+	public String modifyCategory(@RequestParam Map<String, Object> paramMap, HttpSession session) {
+		String isExistCategory = "T";
+
+		SqlSessionFactory temp = null;
+		SqlSession sqlSession = null;
+
+		try {
+			temp = sqlSessionFactory.getObject();
+			sqlSession = temp.openSession();
+
+			Map<String, Object> userDataMap = (Map<String, Object>) session.getAttribute("userDataMap");
+			paramMap.put("postUserNum", userDataMap.get("USER_NUM"));
+
+			String selectedCategory = sqlSession.selectOne("diary.selectCategory", paramMap);
+
+			if( !(selectedCategory.equals((String) paramMap.get("currentCategory"))) ) {
+				isExistCategory = "F";
+				sqlSession.update("diary.updateCategory", paramMap);
+
+				//세션 업데이트 - 게시글
+				updatePostAndCategoryInSession(sqlSession, userDataMap, session);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return isExistCategory;
+	}
+
+	@RequestMapping(value = "/deleteCategory.do")
+	@ResponseBody
+	public void deleteCategory(@RequestParam Map<String, Object> paramMap, HttpSession session) {
+
+		SqlSessionFactory temp = null;
+		SqlSession sqlSession = null;
+
+		try {
+			temp = sqlSessionFactory.getObject();
+			sqlSession = temp.openSession();
+
+			Map<String, Object> userDataMap = (Map<String, Object>) session.getAttribute("userDataMap");
+			paramMap.put("postUserNum", userDataMap.get("USER_NUM"));
+
+			sqlSession.delete("diary.deleteCategory", paramMap);
+
+			//세션 업데이트 - 게시글
+			updatePostAndCategoryInSession(sqlSession, userDataMap, session);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	//인코딩 된 이미지 파일을 디코딩하여 저장
@@ -440,5 +481,33 @@ public class HomeController {
 	    		}
 	    	}
 	    }
+	}
+
+	//세션 업데이트 - 게시글, 카테고리
+	public void updatePostAndCategoryInSession(SqlSession sqlSession, Map<String, Object> userDataMap, HttpSession session) {
+		//diary.jsp에서 보여줄 게시글 목록 데이터
+		//list(map POST_CATEGORY, POST_TITLE, POST_NUM)
+		List<Object> postDataList = sqlSession.selectList("main.loadPostTitles", (Integer) userDataMap.get("USER_NUM"));
+
+		//diary.jsp에서 보여줄 카테고리 데이터
+		List<Object> categoryList = sqlSession.selectList("main.loadCategories", (Integer) userDataMap.get("USER_NUM"));
+
+		//카테고리에 따라 게시글 분류
+		HashMap<String, HashMap<Integer, String>> classifiedPostData = new HashMap<String, HashMap<Integer, String>>();
+
+		for(int i=0; i < categoryList.size(); i++) {
+			String category = (String) categoryList.get(i);
+			classifiedPostData.put(category, new HashMap<Integer, String>());
+			HashMap<Integer, String> postsInCategory = classifiedPostData.get(category);
+			for(int j=0; j < postDataList.size(); j++) {
+				Map<String, Object> post = (Map<String, Object>) postDataList.get(j);
+				if(((String) post.get("POST_CATEGORY")).equals(category)) {
+					postsInCategory.put((Integer) post.get("POST_NUM"), (String) post.get("POST_TITLE"));
+				}
+			}
+		}
+
+		//세션에 현재 등록된 게시글, 카테고리 정보를 등록
+		session.setAttribute("classifiedPostData", classifiedPostData);
 	}
 }
