@@ -123,7 +123,7 @@ body {
 	background-color: #787A91;
 }
 
-input[name="search"] {
+input[name="postKeywords"] {
 	display: inline-block;
 	width: 75%;
 	margin: 3%;

@@ -4,17 +4,18 @@ $(document).ready(function() {
 	console.log("검색 키워드 : " + keyword);
 	console.log("길이 : " + keywordLength);
 
-	$(".result h3, .result p").each(function(index, item) {
-		var wholeHtml = $(item).html();
+	$(".resultTitle, .resultOutline").each(function(index, item) {
+		var wholeHtml = $(item).text();
 
-		var index = wholeHtml.indexOf(keyword);
+		var firstIndex = wholeHtml.indexOf(keyword);
 
-		if(index > -1) {
-			var prefix = wholeHtml.substring(0, index);
+		if(firstIndex > -1) {
+			var prefix = wholeHtml.substring(0, firstIndex);
 
-			var suffix = wholeHtml.substring(index + keywordLength);
+			var suffix = wholeHtml.substring(firstIndex + keywordLength);
 
 			var highlight = prefix + "<span class='highlight'>" + keyword + "</span>" + suffix;
+
 			$(item).html(highlight);
 		}
 	});

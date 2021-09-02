@@ -370,8 +370,46 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "/goPost.do")
-	public String goPost(@RequestParam Map<String, Object> paramMap, Model model) {
+	public String goPost(HttpServletRequest request) {
 		//게시글 검색, 또는 좌측 목록에서 게시글을 누르면 해당 게시글로 이동
+		System.out.println(request.getParameter("postNum"));
+
+		SqlSessionFactory temp = null;
+		SqlSession sqlSession = null;
+
+		try {
+			temp = sqlSessionFactory.getObject();
+			sqlSession = temp.openSession();
+
+			Map<String, Object> postDataMap = sqlSession.selectOne("diary.loadPost", Integer.parseInt(request.getParameter("postNum")));
+			System.out.println(postDataMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		request.setAttribute("includePage", "post");
+
+		return "diary";
+	}
+
+	@RequestMapping(value = "/goSearch.do")
+	public String goSearch(@RequestParam Map<String, Object> paramMap, Model model) {
+		//게시글 검색, 또는 좌측 목록에서 게시글을 누르면 해당 게시글로 이동
+
+		SqlSessionFactory temp = null;
+		SqlSession sqlSession = null;
+		List<Object> postDataMap = null;
+		try {
+			temp = sqlSessionFactory.getObject();
+			sqlSession = temp.openSession();
+
+			postDataMap = sqlSession.selectList("diary.searchPost", paramMap);
+			System.out.println(postDataMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		model.addAttribute("postDataMap", postDataMap);
+		model.addAttribute("includePage", "searchResult");
 
 		return "diary";
 	}
@@ -392,7 +430,7 @@ public class HomeController {
 
 	    		//여따 저장해도 되는건가..?....
 	    		System.out.println(lOutFile.getAbsolutePath() + "에 저장 완료");
-	    	}catch(IOException e){
+	    	} catch(IOException e){
 	    		e.printStackTrace();
 	    	} finally {
 	    		try {

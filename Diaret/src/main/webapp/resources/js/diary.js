@@ -16,7 +16,14 @@ $(document).ready( function() {
 
 	$(".postEvent").each( function(index, item) {
 		$(item).click(function() {
-			location.href = "goPost.do?" + $(item).attr("id").split(".")[1];
+			location.href = "goPost.do?postNum=" + $(item).attr("id").split(".")[1];
+		});
+	});
+
+	$(".btn-group li").each(function(index, item) {
+		$(item).click(function() {
+			$("#selectCategory").html($(item).text() + " <span class=\"caret\"></span>");
+			$("#postCategory").val($(item).text());
 		});
 	});
 });

@@ -16,11 +16,11 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
 	<link rel="stylesheet" href="${ pageContext.request.contextPath }/resources/css/diary.css">
 	<!-- css import end -->
-<head>
-<meta charset="UTF-8">
-<title>diary.jsp</title>
-</head>
-<body>
+	<head>
+		<meta charset="UTF-8">
+		<title>diary.jsp</title>
+	</head>
+	<body>
 	<div id="leftDiv">
 		<!-- left UI -->
 		<div id="profile">
@@ -42,6 +42,25 @@
 				<div id="btnProfile">
 					<button type="button" class="btn btn-danger" id="logout"><i class="bi bi-box-arrow-left"></i></button>
 					<button type="button" class="btn btn" id="modify"><i class="bi bi-gear-fill"></i></button>
+				</div>
+			</form>
+		</div>
+		<div id="searchBox">
+			<!-- 검색 보이기 -->
+			<form id="searchForm" action="goSearch.do">
+				<div class="btn-group">
+					<button id="selectCategory" type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">ALL<span class="caret"></span></button>
+					<input id="postCategory" type="hidden" name="postCategory" value="ALL"/>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#">ALL</a></li>
+						<c:forEach items="${ classifiedPostData }" var="category" varStatus="status">
+							<li><a href="#">${ category.key }</a></li>
+						</c:forEach>
+					</ul>
+				</div>
+				<div id="inlineElements">
+					<input type="text" class="form-control" name="postKeywords" placeholder="제목 또는 내용으로 검색"/>
+					<button type="submit" class="btn btn-info" id="submit">검색</button>
 				</div>
 			</form>
 		</div>
@@ -68,22 +87,6 @@
 					</c:forEach>
 				</div>
 			</div>
-		</div>
-		<div id="searchBox">
-		<!-- 검색 보이기 -->
-			<form id="searchForm">
-				<div class="btn-group">
-					<button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown"> 모두 <span class="caret"></span></button>
-					<ul class="dropdown-menu" role="menu">
-						<li><a href="#">카테고리1</a></li>
-						<li><a href="#">카테고리2</a></li>
-					</ul>
-				</div>
-				<div id="inlineElements">
-					<input type="text" class="form-control" name="search" placeholder="제목 또는 내용으로 검색"/>
-					<button type="button" class="btn btn-info" id="submit">검색</button>
-				</div>
-			</form>
 		</div>
 	</div>
 	<div id="rightDiv">
