@@ -16,17 +16,19 @@
 		<div id="square">
 			<c:choose>
 				<c:when test="${ empty userDataMap.USER_IMG_EXP }">
-					<img id="imgProfile" alt="${ userDataMap }" src="${ pageContext.request.contextPath }/resources/images/defaultProfile.jpg">
+					<img id="imgPreview" alt="${ userDataMap }" src="${ pageContext.request.contextPath }/resources/images/defaultProfile.jpg">
 				</c:when>
 				<c:otherwise>
-					<img id="imgProfile" alt="errorDir" src="/diaret/resources/userData/${ userDataMap.USER_NUM }/profile.${ userDataMap.USER_IMG_EXP }">
+					<img id="imgPreview" alt="errorDir" src="${ pageContext.request.contextPath }/resources/userData/${ userDataMap.USER_NUM }/profile.${ userDataMap.USER_IMG_EXP }">
 				</c:otherwise>
 			</c:choose>
 		</div>
 	</div>
 	<!-- 이미지 관련 버튼만 모아놓은 div -->
 	<div id="inputImg">
-		<form id="settingImgForm">
+		<!-- enctype="multipart/form-data" : img post방식도 보낼 수 있는 데이터 양의 한계가 있다.
+		큰 이미지 파일을 전송하겠다고 컨트롤러에게 알려주는 역할(?)이다. -->
+		<form id="settingImgForm" enctype="multipart/form-data">
 			<h1 id="title1">프로필 사진 변경</h1>
 			<input id="srcImg" name="srcImg" type="file" class="form-control" accept="image/gif, image/jpeg, image/png" onchange="chk_file_type(this)"/>
 			<div>

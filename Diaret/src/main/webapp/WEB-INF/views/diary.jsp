@@ -33,7 +33,7 @@
 						<img id="imgProfile" alt="${ userDataMap }" src="${ pageContext.request.contextPath }/resources/images/defaultProfile.jpg">
 					</c:when>
 					<c:otherwise>
-						<img id="imgProfile" alt="errorDir" src="/diaret/resources/userData/${ userDataMap.USER_NUM }/profile.${ userDataMap.USER_IMG_EXP }">
+						<img id="imgProfile" alt="errorDir" src="${ pageContext.request.contextPath }/resources/userData/${ userDataMap.USER_NUM }/profile.${ userDataMap.USER_IMG_EXP }">
 					</c:otherwise>
 				</c:choose>
 			</div>

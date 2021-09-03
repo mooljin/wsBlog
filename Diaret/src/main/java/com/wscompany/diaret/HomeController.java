@@ -1,9 +1,16 @@
 package com.wscompany.diaret;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Base64.Decoder;
@@ -225,49 +232,47 @@ public class HomeController {
 
 	@RequestMapping(value = "/applyImg.do")
 	public String applyImg(@RequestParam Map<String, Object> paramMap, HttpServletRequest request) {
-		Set<?> pathSet = request.getSession().getServletContext().getResourcePaths("/");
-
-		System.out.println(pathSet);
-
 		//이미지 디코딩
 		Decoder decoder =  Base64.getDecoder();
 		byte[] binaryImg = decoder.decode((String) paramMap.get("encodedStr"));
 
-		//프로필 이미지 저장할 경로 지정. (프로젝트 내부로 경로를 잡고 싶은데, 잘 안 됨.)
-		String contextPath = request.getContextPath();
-		HttpSession session = request.getSession();
-		int userNum = (Integer) ((Map<String, Object>) session.getAttribute("userDataMap")).get("USER_NUM");
-//		String dir = application.getRealPath("resources/userData") + "/" + userNum;
-		String dir = contextPath + "/resources/userData/" + userNum;
-		System.out.println(dir);
-		String file = "profile" + "." + ((String) paramMap.get("exp"));
-		System.out.println(file);
-
-		//프로필 이미지 저장
-		writeToFile(dir, file, binaryImg);
 
 		SqlSessionFactory temp = null;
 		SqlSession sqlSession = null;
 		Map<String, Object> userDataMap = null;
 
 		try {
+			int userNum = (Integer) ((Map<String, Object>) request.getSession().getAttribute("userDataMap")).get("USER_NUM");
+			String exp = (String) paramMap.get("userImgExp");
+			//프로필 이미지 저장할 경로 지정. (프로젝트 내부로 경로를 잡고 싶은데, 잘 안 됨.)
+			// "/" : webapp을 가리킴.
+			// getResourcePaths("/") : webapp/* 밑에 있는 파일들을 반환.
+			// getResourcePaths("/resources/") : webapp/resources/* 에 있는 파일들을 반환.
+			URL url= request.getSession().getServletContext().getResource("/resources/userData/" + userNum + "/profile." + exp);
+
+			System.out.println(url);
+
+//			String dir = application.getRealPath("resources/userData") + "/" + userNum;
+
+			//프로필 이미지 저장
+			writeToFile(url, binaryImg);
+
 			temp = sqlSessionFactory.getObject();
 			sqlSession = temp.openSession();
 
-			Map<String, Object> imgSrc = new HashMap<String, Object>();
-			imgSrc.put("userNum", userNum);
-			imgSrc.put("userImgExp", dir + "/" + file);
+			paramMap.put("userNum", userNum);
 
-			//이미지 저장 주소 위치를 DB에 저장
-			sqlSession.update("modify.updateImg", paramMap.get("exp"));
+			//이미지 확장자를 DB에 저장
+			sqlSession.update("modify.updateImg", paramMap);
+
+			String userId = (String) ((Map<String, Object>) request.getSession().getAttribute("userDataMap")).get("USER_ID");
+			userDataMap = sqlSession.selectOne("modify.selectAfterUpdate", userId);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			sqlSession.close();
 		}
 		//세션 정보 갱신
-		String userId = (String) ((Map<String, Object>) session.getAttribute("userDataMap")).get("USER_ID");
-		userDataMap = sqlSession.selectOne("modify.selectAfterUpdate", userId);
 
 		request.getSession().setAttribute("userDataMap", userDataMap);
 		request.setAttribute("includePage", "noPost");
@@ -455,32 +460,20 @@ public class HomeController {
 		}
 	}
 
-	//인코딩 된 이미지 파일을 디코딩하여 저장
-	public void writeToFile(String dir, String file, byte[] pData) {
-	    if(pData != null){
-	    	if( !(new File(dir).isDirectory()) ) {
-	    		new File(dir).mkdirs();
-	    	}
+	//인코딩 된 이미지 파일을 저장(미완성)
+	public void writeToFile(URL url, byte[] pData) {
+	    HttpURLConnection uc = null;
+		try {
+			uc = (HttpURLConnection) url.openConnection();
 
-	    	FileOutputStream lFileOutputStream = null;
+			if(uc.getResponseCode() == HttpURLConnection.HTTP_OK) {
+				uc.setDoOutput(true);
+				uc.getOutputStream().write(pData);
+			}
 
-	    	try{
-	    		File lOutFile = new File(dir, file);
-	    		lFileOutputStream = new FileOutputStream(lOutFile);
-	    		lFileOutputStream.write(pData);
-
-	    		//여따 저장해도 되는건가..?....
-	    		System.out.println(lOutFile.getAbsolutePath() + "에 저장 완료");
-	    	} catch(IOException e){
-	    		e.printStackTrace();
-	    	} finally {
-	    		try {
-	    			lFileOutputStream.close();
-	    		} catch (IOException e) {
-	    			e.printStackTrace();
-	    		}
-	    	}
-	    }
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	//세션 업데이트 - 게시글, 카테고리

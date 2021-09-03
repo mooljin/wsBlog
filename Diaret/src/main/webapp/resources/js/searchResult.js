@@ -6,9 +6,18 @@ $(document).ready(function() {
 	$(".resultTitle, .resultOutline").each(function(index1, item1) {
 		var wholeHtml = $(item1).text();
 
-		var firstIndex = wholeHtml.indexOf(keyword);
-
 		var maximumLength = 200;
+
+		//대소문자 구분 없이(i) 키워드와 일치하는 모든 문자열(g)을 반환
+		var regexAllCase = new RegExp(keyword, "gi");
+		//일치하는 게 없으면 빈 배열이 아닌 null을 반환
+		var matchKeywords = wholeHtml.match(regexAllCase);
+
+		//일치하는 키워드 중 첫번째 키워드의 위치. 없으면 -1로 그대로 유지.
+		var firstIndex = -1;
+		if(matchKeywords != null) {
+			var firstIndex = wholeHtml.indexOf(matchKeywords[0]);
+		}
 
 		//현재 다루고 있는 item이 내용인가?
 		if($(item1).attr("class") == "resultOutline") {
@@ -29,14 +38,15 @@ $(document).ready(function() {
 			}
 		}
 
-		if(firstIndex > -1) {
-			var splitedStr = wholeHtml.split(keyword);
+		if(matchKeywords != null) {
+
+			var splitedStr = wholeHtml.split(regexAllCase);
 
 			var highlight = splitedStr[0];
 
 			$(splitedStr).each(function(index2, item2) {
 				if(index2 != 0) {
-					highlight += "<span class='highlight'>" + keyword + "</span>" + item2;
+					highlight += "<span class='highlight'>" + matchKeywords[index2 - 1] + "</span>" + item2;
 				}
 			});
 

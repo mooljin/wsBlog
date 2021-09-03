@@ -12,7 +12,7 @@
 	<select id="searchPost" parameterType="Map" resultType="hashMap">
 		SELECT POST_NUM, POST_CATEGORY, POST_TITLE, POST_DATE, POST_USER_NUM, POST_KEYWORDS
 		  FROM POST_INFO
-		 WHERE ( POST_KEYWORDS LIKE CONCAT('%',#{postKeywords},'%') OR POST_TITLE LIKE CONCAT('%',#{postKeywords},'%') )
+		 WHERE ( UPPER(POST_KEYWORDS) LIKE CONCAT('%', UPPER(#{postKeywords}),'%') OR UPPER(POST_TITLE) LIKE CONCAT('%', UPPER(#{postKeywords}),'%') )
 		   AND POST_USER_NUM = #{postUserNum}
 		 <choose>
 		 	<when test="postCategory != 'ALL'">

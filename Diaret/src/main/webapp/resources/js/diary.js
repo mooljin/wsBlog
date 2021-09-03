@@ -1,5 +1,7 @@
 $(document).ready( function() {
 
+
+	//로그아웃
 	$("#logout").click( function() {
 		var checkLogout = confirm("로그아웃 하시겠습니까?");
 		if(checkLogout) {
@@ -8,18 +10,21 @@ $(document).ready( function() {
 		}
 	});
 
+	//개인정보 수정
 	$("#modify").click( function() {
 
 		$("#btnForm").attr("action", "goModify.do");
 		$("#btnForm").submit();
 	});
 
+	//게시글 보기
 	$(".postEvent").each( function(index, item) {
 		$(item).click(function() {
 			location.href = "goPost.do?postNum=" + $(item).attr("id").split(".")[1];
 		});
 	});
 
+	//검색 옵션에 있는 카테고리를 누르면 버튼 내용을 검색하고자 하는 카테고리 이름으로 변경.
 	$(".btn-group li").each(function(index, item) {
 		$(item).click(function() {
 			$("#selectCategory").html($(item).text() + " <span class=\"caret\"></span>");
@@ -27,6 +32,11 @@ $(document).ready( function() {
 		});
 	});
 
+	$("#submit").click(function () {
+		$("input[name=postKeywords]").val($("input[name=postKeywords]").val().trim());
+	});
+
+	//카테고리 이름 변경, 삭제 관련 기능
 	$(".panel-heading").each(function(index, item) {
 
 		var addHoveringEvent = function() {
@@ -65,7 +75,7 @@ $(document).ready( function() {
 
 		$(item).find(".editSubmit").click(function() {
 
-			currentCategory = $(item).find(".editInput").val();
+			currentCategory = $(item).find(".editInput").val().trim();
 
 			var data = {
 				"previousCategory" : previousCategory,
@@ -86,7 +96,15 @@ $(document).ready( function() {
 						$(item).find(".btnEditCategory1").removeAttr("hidden");
 						$(item).find(".btnEditCategory2").attr("hidden", "true");
 
+						//목록으로 보여지는 카테고리 이름 변경
 						$(item).find(".fontSize18").html("<i class='bi bi-folder-fill'></i>" + currentCategory);
+						//검색 옵션으로 보여지는 카테고리 이름 변경
+						//검색 콤보박스 옵션 중 해당 카테고리 제거
+						$(".dropdown-menu").find("li").each(function(index, item) {
+							if($(item).text().trim() == previousCategory) {
+								$(item).html("<a href='#'>" + currentCategory + "</a>");
+							}
+						});
 						previousCategory = currentCategory;
 						addHoveringEvent();
 					}
@@ -116,6 +134,13 @@ $(document).ready( function() {
 						//카테고리 UI중 카테고리 제목 부분 삭제. (후손 태그까지 모두)
 						//순서 주의. 삭제할 게 여러개 있다면 삭제할 것을 토대로 찾아낸 태그부터 삭제할 것.
 						$(item).remove();
+
+						//검색 콤보박스 옵션 중 해당 카테고리 제거
+						$(".dropdown-menu").find("li").each(function(index, item) {
+							if($(item).text().trim() == previousCategory) {
+								$(item).remove();
+							}
+						});
 						alert("카테고리를 삭제하였습니다.");
 
 						//siblings() : 자신과 위치가 같은 형제 태그를 모두 가져온다. 부모가 달라도 들고온다.

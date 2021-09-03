@@ -39,11 +39,11 @@ $(document).ready( function() {
 				var strArray1 = userImg.split(','); // data:image/jpg;base64    bewifvbaweufviurebign2a332tasQ#W%agt#$TaGw34TGt44#WtSAET3a4tgs$...
 				var strArray2 = strArray1[0].split('/'); // data:image    jpg;base64
 				var strArray3 = strArray2[1].split(';'); // jpg    base64
-				var exp = strArray3[0];
+				var userImgExp = strArray3[0];
 				var encodedStr = strArray1[1];
 				//디코딩은 하는데 깨진다. java에서 디코딩을 진행함.
 
-				var data = { "exp" : exp, "encodedStr" : encodedStr };
+				var data = { "userImgExp" : userImgExp, "encodedStr" : encodedStr };
 				$.ajax({
 					type: 'post',
 					url: 'applyImg.do',
