@@ -12,7 +12,8 @@
 	<p id="postTitle">${ focusedPost.POST_TITLE }</p>
 	<div id="displayFlex">
 		<p id="postDate">${ focusedPost.POST_DATE }</p>
-		<form id="postOptionForm" autocomplete="off">
+		<form id="postOptionForm">
+			<input id="postNum" type="hidden" name="postNum" value="${ focusedPost.POST_NUM }"/>
 			<button id="newPost" type="button" class="btn btn-success">새 글</button>
 			<button id="modifyPost" type="button" class="btn btn-success">수정</button>
 			<button id="deletePost" type="button" class="btn btn-danger">삭제</button>

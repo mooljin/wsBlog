@@ -8,6 +8,8 @@ $(document).ready( function() {
 		$("#userPw").val(btoa($("#userPw").val()));
 		if($("#sessionUserPw").val() == btoa($("#identifyInput").val())) {
 
+			console.log(eventSrc);
+
 			//"저장 버튼을 누르고 모든 사용자 입력값이 조건에 부합할 때 추가로 해야 할 것들
 			if(eventSrc == "doModify") {
 				var data = $(form).serializeObject();
@@ -43,6 +45,7 @@ $(document).ready( function() {
 				var encodedStr = strArray1[1];
 				//디코딩은 하는데 깨진다. java에서 디코딩을 진행함.
 
+				console.log(encodedStr);
 				var data = { "userImgExp" : userImgExp, "encodedStr" : encodedStr };
 				$.ajax({
 					type: 'post',

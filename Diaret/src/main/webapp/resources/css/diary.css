@@ -8,7 +8,7 @@ object-fit: cover; 대체 콘텐츠의 가로세로비를 유지하면서, 요�
 overflow - CSS 단축 속성은 요소의 콘텐츠가 너무 커서 요소의 블록 서식 맥락에 맞출 수 없을 때의 처리법을 지정합니다.
 overflow: hidden; 콘텐츠를 안쪽 여백 상자에 맞추기 위해 잘라냅니다.
 height 대신 padding-bottom을 쓰면 이 값은 부모 요소의 width값을 기준으로 계산되므로 창의 크기를 바꿔도 width와 항상 동일한 길이로 변화한다.
-  */
+*/
 
 /* * {
 	border: green solid 1px;
@@ -54,6 +54,7 @@ body {
 #alignCenter {
 	display: inline-block;
 	width: 250px;
+	height: 250px;
     border-radius: 250px;
     overflow: hidden;
 }

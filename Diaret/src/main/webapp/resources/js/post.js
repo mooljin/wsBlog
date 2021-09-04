@@ -1,35 +1,25 @@
 $(document).ready(function() {
 
 	$("#newPost").click(function() {
-		$("#btnForm").attr("action", "goWrite.do");
-		$("#btnForm").submit();
+		$("#postNum").val("0");
+		$("#postOptionForm").attr("action", "goWrite.do");
+		$("#postOptionForm").submit();
 	});
 
 	$("#modifyPost").click(function() {
+		console.log($("#postNum").val());
+		$("#postOptionForm").attr("action", "goWrite.do");
+		$("#postOptionForm").submit();
+	});
 
-		var category = $("#categoryTitle").text();
-		var title = $("#postTitle").text();
-		var content = $("#bottomDiv").html();
-		var keywords = $("#bottomDiv").text();
-		var data = {
-			"category" : category,
-			"title" : title,
-			"content" : content,
-			"keywords" : keywords
-		};
+	$("#deletePost").click(function() {
+		var checkDelete = confirm("정말 삭제하시겠습니까?");
 
-		$.ajax({
-			type: 'post',
-			url: 'goWrite.do',
-			data: data,
-			async: false,
-			success: function() {
-				//요청이 중복으로 보내지거나, 한번만 나가는데 페이지 이동은 안됨.
-				//요청이 한 번만 나가면서, 페이지 이동을 하길 원함.
-//				$("#btnForm").attr("action", "goWrite.do");
-//				$("#btnForm").submit();
-			}
-		});
-
+		if(checkDelete) {
+			//미구현
+			$("#postOptionForm").attr("action", "doDelete.do");
+			//submit안에 function을 넣으면 submit직전에 해야 할 일을 먼저 한 다음 submit을 한다.
+			$("#postOptionForm").submit();
+		}
 	});
 });

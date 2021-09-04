@@ -52,9 +52,9 @@
 					<button id="selectCategory" type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">ALL<span class="caret"></span></button>
 					<input id="postCategory" type="hidden" name="postCategory" value="ALL"/>
 					<ul class="dropdown-menu" role="menu">
-						<li><a href="#">ALL</a></li>
+						<li class="dropdown-item"><a href="#">ALL</a></li>
 						<c:forEach items="${ classifiedPostData }" var="category" varStatus="status">
-							<li><a href="#">${ category.key }</a></li>
+							<li class="dropdown-item"><a href="#">${ category.key }</a></li>
 						</c:forEach>
 					</ul>
 				</div>

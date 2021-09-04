@@ -28,7 +28,7 @@
 	<div id="inputImg">
 		<!-- enctype="multipart/form-data" : img post방식도 보낼 수 있는 데이터 양의 한계가 있다.
 		큰 이미지 파일을 전송하겠다고 컨트롤러에게 알려주는 역할(?)이다. -->
-		<form id="settingImgForm" enctype="multipart/form-data">
+		<form id="settingImgForm" enctype="multipart/form-data" method="post">
 			<h1 id="title1">프로필 사진 변경</h1>
 			<input id="srcImg" name="srcImg" type="file" class="form-control" accept="image/gif, image/jpeg, image/png" onchange="chk_file_type(this)"/>
 			<div>

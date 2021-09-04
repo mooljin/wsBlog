@@ -93,23 +93,49 @@ $(document).ready(function() {
 				editor.focus({
 					preventScroll : true
 				});
+				//bool = document.execCommand(aCommandName, aShowDefaultUI, aValueArgument)
+				/*
+				 * HTML 문서가 designMode로 전환되면, 즉 편집 가능한 상태라면 이 함수를 사용할 수 있다.
+				 * 이 함수는 문서의 편집 가능한 영역에 있는 요소들을 편집할 수 있도록 해준다.
+				 * 파라미터
+				 * aCommandName : 실행할 명령어. 사용 가능한 명령어는 검색이 필요함.
+				 * aShowDefaultUI : 기본 사용자 UI를 나타내고 싶다면 true.
+				 * aValueArgument : 명령어에 따라 파라미터가 필요할 수 있음. 필요없다면 null, 필요하다면 넣어줄 것.
+				 * 반환값 bool : 정상적으로 적용되었다면 true, 명령어가 적절하지 않거나 실패한 경우 false.
+				 * */
 				document.execCommand('insertImage', false, `${reader.result}`);
 			});
 			reader.readAsDataURL(file);
 		}
 	}
-});
 
-// function chk_file_type(obj) {
-//
-// var file_kind = obj.value.lastIndexOf('.');
-// var file_name = obj.value.substring(file_kind+1,obj.length);
-// var file_type = file_name.toLowerCase();
-// var check_file_type=['jpg','gif','png','jpeg','bmp','tif'];
-//
-// if(check_file_type.indexOf(file_type)==-1) {
-// alert('이미지 파일만 업로드를 할 수 있습니다.');
-// } else {
-// insertImageDate(file);
-// }
-// }
+	$("#savePost").click(function() {
+		var errMsg = "";
+
+		//공란 검사
+		//제목
+		if(!$("#titleInput").val().trim()) {
+			errMsg = "제목을 입력하세요.";
+		}
+
+		//카테고리
+		if(!errMsg && !$("#categoryInput").val().trim()) {
+			errMsg = "카테고리를 입력하세요.";
+		}
+
+		//내용 - 사진도 없고 텍스트도 없으면 공란으로 판단, 둘 중 하나라도 있으면 공란이 아님.
+		if(!errMsg && $("#editor").find("img").length == 0 && !$("#editor").text().trim()) {
+			errMsg = "내용을 입력하세요.";
+		}
+
+		if(errMsg) {
+			alert(errMsg);
+		} else {
+			$("#postForm").attr("action", "savePost.do");
+			$("#contentHtml").val($("#editor").html());
+			console.log($("#contentHtml").val());
+
+//			$("#postForm").submit();
+		}
+	});
+});

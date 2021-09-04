@@ -1,6 +1,5 @@
 $(document).ready( function() {
 
-
 	//로그아웃
 	$("#logout").click( function() {
 		var checkLogout = confirm("로그아웃 하시겠습니까?");

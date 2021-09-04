@@ -232,6 +232,8 @@ public class HomeController {
 
 	@RequestMapping(value = "/applyImg.do")
 	public String applyImg(@RequestParam Map<String, Object> paramMap, HttpServletRequest request) {
+		System.out.println(paramMap.get("userImgExp"));
+		System.out.println(paramMap.get("encodedStr"));
 		//이미지 디코딩
 		Decoder decoder =  Base64.getDecoder();
 		byte[] binaryImg = decoder.decode((String) paramMap.get("encodedStr"));
@@ -248,14 +250,18 @@ public class HomeController {
 			// "/" : webapp을 가리킴.
 			// getResourcePaths("/") : webapp/* 밑에 있는 파일들을 반환.
 			// getResourcePaths("/resources/") : webapp/resources/* 에 있는 파일들을 반환.
-			URL url= request.getSession().getServletContext().getResource("/resources/userData/" + userNum + "/profile." + exp);
+			//다만 이 url은 github에 있는 프로젝트 폴더에 저장되는 것이 아닌
+			//이클립스 workspace에 있는 프로젝트 폴더에 저장됨.
+			URL url= request.getSession().getServletContext().getResource("/resources/userData");
 
-			System.out.println(url);
+			//원하는 위치 : D:/git/wsBlog/Diaret/src/main/webapp/resources/userData/4/profile.png (프로젝트 폴더를 옮겨도 지장없게끔)
+//			String path = url.getPath();
+			String path = "D:/git/wsBlog/Diaret/src/main/webapp/resources/userData";
 
 //			String dir = application.getRealPath("resources/userData") + "/" + userNum;
 
 			//프로필 이미지 저장
-			writeToFile(url, binaryImg);
+			writeToFile(path, binaryImg, userNum, exp);
 
 			temp = sqlSessionFactory.getObject();
 			sqlSession = temp.openSession();
@@ -276,6 +282,8 @@ public class HomeController {
 
 		request.getSession().setAttribute("userDataMap", userDataMap);
 		request.setAttribute("includePage", "noPost");
+
+		//프로필 반영이 너무 느림. 한 20초는 기다려야 반영됨.
 
 		return "diary";
 	}
@@ -346,13 +354,22 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "/goWrite.do")
-	public String goWrite(@RequestParam Map<String, Object> paramMap, Model model) {
-		System.out.println("몇 번 들어오냐?");
-		System.out.println(paramMap);
-		model.addAttribute("category", paramMap.get("category"));
-		model.addAttribute("title", paramMap.get("title"));
-		model.addAttribute("content", paramMap.get("content"));
+	public String goWrite(int postNum, Model model) {
 
+		SqlSessionFactory temp = null;
+		SqlSession sqlSession = null;
+		Map<String, Object> postDataMap = null;
+
+		try {
+			temp = sqlSessionFactory.getObject();
+			sqlSession = temp.openSession();
+
+			postDataMap = sqlSession.selectOne("diary.loadPost", postNum);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		model.addAttribute("postDataMap", postDataMap);
 		model.addAttribute("includePage", "writePost");
 		return "diary";
 	}
@@ -460,19 +477,45 @@ public class HomeController {
 		}
 	}
 
-	//인코딩 된 이미지 파일을 저장(미완성)
-	public void writeToFile(URL url, byte[] pData) {
-	    HttpURLConnection uc = null;
-		try {
-			uc = (HttpURLConnection) url.openConnection();
+	@RequestMapping(value = "/savePost.do")
+	@ResponseBody
+	public void savePost(@RequestParam Map<String, Object> paramMap, HttpSession session) {
 
-			if(uc.getResponseCode() == HttpURLConnection.HTTP_OK) {
-				uc.setDoOutput(true);
-				uc.getOutputStream().write(pData);
-			}
+		System.out.println(paramMap.keySet().toString());
+		System.out.println(paramMap.get("contentHtml"));
+
+		SqlSessionFactory temp = null;
+		SqlSession sqlSession = null;
+
+		try {
+			temp = sqlSessionFactory.getObject();
+			sqlSession = temp.openSession();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	//인코딩 된 이미지 파일을 저장(미완성)
+	public void writeToFile(String path, byte[] pData, int userNum, String exp) {
+		String profilePath = "profile." + exp;
+		File dir = new File(path + "/" + userNum);
+		if(!dir.isDirectory()) {
+			dir.mkdirs();
+		}
+		FileOutputStream fos = null;
+		try {
+			fos = new FileOutputStream(new File(dir, profilePath));
+			fos.write(pData);
 
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				fos.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
