@@ -77,6 +77,7 @@ $(document).ready(function() {
 		}
 	});
 
+	//이미지 파일 올릴 때 사용하는 함수
 	function insertImageDate(file) {
 		var file_kind = imageSelector.value.lastIndexOf('.');
 		var file_name = imageSelector.value.substring(file_kind + 1,
@@ -109,6 +110,7 @@ $(document).ready(function() {
 		}
 	}
 
+	//저장 버튼을 누를 시 수행할 함수
 	$("#savePost").click(function() {
 		var errMsg = "";
 
@@ -135,7 +137,7 @@ $(document).ready(function() {
 			$("#contentHtml").val($("#editor").html());
 			console.log($("#contentHtml").val());
 
-//			$("#postForm").submit();
+			$("#postForm").submit();
 		}
 	});
 });

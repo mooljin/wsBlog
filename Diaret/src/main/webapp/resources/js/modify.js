@@ -46,17 +46,23 @@ $(document).ready( function() {
 				//디코딩은 하는데 깨진다. java에서 디코딩을 진행함.
 
 				console.log(encodedStr);
-				var data = { "userImgExp" : userImgExp, "encodedStr" : encodedStr };
-				$.ajax({
-					type: 'post',
-					url: 'applyImg.do',
-					data: data,
-					async: false,
-					success: function() {
-						alert("수정되었습니다.");
-//						$(form).submit();
-					}
-				});
+
+				//새로운 폼을 만듦. (jquery 방식)
+				var newImgForm = $("<form></form>");
+
+				newImgForm.attr("method", "post");
+				newImgForm.attr("action", "applyImg.do");
+
+				//새로 만든 폼에 넣을 input 생성, attr 설정
+
+				newImgForm.append($("<input/>", {type: "hidden", name: "userImgExp", value: userImgExp}));
+				newImgForm.append($("<input/>", {type: "hidden", name: "encodedStr", value: encodedStr}));
+
+				//새로 만든 폼을 body 태그 밑에 추가
+				newImgForm.appendTo("body");
+
+				//submit!
+				newImgForm.submit();
 			}
 
 			if(eventSrc == "initializeImg") {

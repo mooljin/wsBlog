@@ -16,6 +16,7 @@ import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +38,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.oreilly.servlet.MultipartRequest;
+import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 
 
 @Controller
@@ -217,10 +221,7 @@ public class HomeController {
 			sqlSession.update("modify.initializeImg", (Integer) userDataMap.get("USER_NUM"));
 
 			//세션 정보 갱신
-			String userId = (String) userDataMap.get("USER_ID");
-			userDataMap = sqlSession.selectOne("modify.selectAfterUpdate", userId);
-
-			session.setAttribute("userDataMap", userDataMap);
+			updateUserDataInSession(sqlSession, userDataMap, session);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -231,7 +232,7 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "/applyImg.do")
-	public String applyImg(@RequestParam Map<String, Object> paramMap, HttpServletRequest request) {
+	public String applyImg(@RequestParam Map<String, Object> paramMap, HttpServletRequest request, HttpSession session) {
 		System.out.println(paramMap.get("userImgExp"));
 		System.out.println(paramMap.get("encodedStr"));
 		//이미지 디코딩
@@ -252,10 +253,11 @@ public class HomeController {
 			// getResourcePaths("/resources/") : webapp/resources/* 에 있는 파일들을 반환.
 			//다만 이 url은 github에 있는 프로젝트 폴더에 저장되는 것이 아닌
 			//이클립스 workspace에 있는 프로젝트 폴더에 저장됨.
-			URL url= request.getSession().getServletContext().getResource("/resources/userData");
+//			URL url= session.getServletContext().getResource("/resources/userData");
 
 			//원하는 위치 : D:/git/wsBlog/Diaret/src/main/webapp/resources/userData/4/profile.png (프로젝트 폴더를 옮겨도 지장없게끔)
 //			String path = url.getPath();
+			//모르겠다. 일단 이렇게 하면 해결됨.....
 			String path = "D:/git/wsBlog/Diaret/src/main/webapp/resources/userData";
 
 //			String dir = application.getRealPath("resources/userData") + "/" + userNum;
@@ -271,8 +273,9 @@ public class HomeController {
 			//이미지 확장자를 DB에 저장
 			sqlSession.update("modify.updateImg", paramMap);
 
-			String userId = (String) ((Map<String, Object>) request.getSession().getAttribute("userDataMap")).get("USER_ID");
+			String userId = (String) ((Map<String, Object>) session.getAttribute("userDataMap")).get("USER_ID");
 			userDataMap = sqlSession.selectOne("modify.selectAfterUpdate", userId);
+			session.setAttribute("userDataMap", userDataMap);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -280,7 +283,6 @@ public class HomeController {
 		}
 		//세션 정보 갱신
 
-		request.getSession().setAttribute("userDataMap", userDataMap);
 		request.setAttribute("includePage", "noPost");
 
 		//프로필 반영이 너무 느림. 한 20초는 기다려야 반영됨.
@@ -306,13 +308,12 @@ public class HomeController {
 				sqlSession.update("modify.updateUser", paramMap);
 			}
 			//세션 정보 갱신
-			userDataMap = sqlSession.selectOne("modify.selectAfterUpdate", paramMap.get("userId"));
+			updateUserDataInSession(sqlSession, userDataMap, session);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			sqlSession.close();
 		}
-		session.setAttribute("userDataMap", userDataMap);
 		request.setAttribute("includePage", "noPost");
 
 		return "diary";
@@ -354,7 +355,7 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "/goWrite.do")
-	public String goWrite(int postNum, Model model) {
+	public String goWrite(@RequestParam Map<String, Object> paramMap, Model model) {
 
 		SqlSessionFactory temp = null;
 		SqlSession sqlSession = null;
@@ -364,7 +365,7 @@ public class HomeController {
 			temp = sqlSessionFactory.getObject();
 			sqlSession = temp.openSession();
 
-			postDataMap = sqlSession.selectOne("diary.loadPost", postNum);
+			postDataMap = sqlSession.selectOne("diary.loadPost", Integer.parseInt((String) paramMap.get("postNum")));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -477,26 +478,43 @@ public class HomeController {
 		}
 	}
 
+	//미완성 - 게시글 저장
 	@RequestMapping(value = "/savePost.do")
-	@ResponseBody
-	public void savePost(@RequestParam Map<String, Object> paramMap, HttpSession session) {
-
-		System.out.println(paramMap.keySet().toString());
-		System.out.println(paramMap.get("contentHtml"));
+	public String savePost(HttpServletRequest request, HttpSession session) {
+		//이미지와 같은 큰 데이터를 받기 위해, form에서 enctype="multipart/form-data"을 설정했다면
+		//일반적으로 request.getParameter로 받을 수 없다.
+		//다른 방법을 적용해 보자.
+		/*
+		 * 전송한 폼에 담겨진 파라미터들에 대한 이름과 값을 얻어내기 위해,그리고
+		 *
+		 * <input type="file">로 지정된 파일을 서버상의 한 폴더에 업로드하기 위해서 특별한 컴포넌트가 필요하다.
+		 *
+		 * 따라서 http://servlets.com 에서 제공하는 cos.jar 파일에 있는 필요한 컴포넌트를 사용하기 위해 이를 WEB-INF lib에
+		 * 설치하였다.
+		 */
+		String path = "D:/git/wsBlog/Diaret/src/main/webapp/resources/userData";
 
 		SqlSessionFactory temp = null;
 		SqlSession sqlSession = null;
+		MultipartRequest mr = null;
 
 		try {
+
+			mr = new MultipartRequest(request, path, 1024*1024*10, "utf-8", new DefaultFileRenamePolicy());
+
 			temp = sqlSessionFactory.getObject();
 			sqlSession = temp.openSession();
 
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			sqlSession.close();
 		}
+		request.setAttribute("includePage", "post");
+		return "diary";
 	}
 
-	//인코딩 된 이미지 파일을 저장(미완성)
+	//인코딩 된 이미지 파일을 저장
 	public void writeToFile(String path, byte[] pData, int userNum, String exp) {
 		String profilePath = "profile." + exp;
 		File dir = new File(path + "/" + userNum);
@@ -517,6 +535,13 @@ public class HomeController {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	//세션 업데이트 - 유저 정보
+	public void updateUserDataInSession(SqlSession sqlSession, Map<String, Object> userDataMap, HttpSession session) {
+		String userId = (String) ((Map<String, Object>) session.getAttribute("userDataMap")).get("USER_ID");
+		userDataMap = sqlSession.selectOne("modify.selectAfterUpdate", userId);
+		session.setAttribute("userDataMap", userDataMap);
 	}
 
 	//세션 업데이트 - 게시글, 카테고리

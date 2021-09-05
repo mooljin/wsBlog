@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="${ pageContext.request.contextPath }/resources/css/writePost.css">
 <!-- css import end -->
 
-<form id="postForm">
+<form id="postForm" method="post" enctype="multipart/form-data">
 	<!-- 페이지 제목 및 저장 버튼 부분 -->
 	<div id="editor-menu1" class="editor-menu">
 		<h1>게시글 작성</h1>
