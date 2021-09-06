@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -41,6 +42,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.oreilly.servlet.MultipartRequest;
 import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
+import com.sun.xml.internal.ws.api.model.MEP;
 
 
 @Controller
@@ -307,6 +309,7 @@ public class HomeController {
 			} else {
 				sqlSession.update("modify.updateUser", paramMap);
 			}
+
 			//세션 정보 갱신
 			updateUserDataInSession(sqlSession, userDataMap, session);
 		} catch (Exception e) {
@@ -355,7 +358,7 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "/goWrite.do")
-	public String goWrite(@RequestParam Map<String, Object> paramMap, Model model) {
+	public String goWrite(@RequestParam Map<String, Object> paramMap, Model model, HttpSession session) {
 
 		SqlSessionFactory temp = null;
 		SqlSession sqlSession = null;
@@ -365,12 +368,16 @@ public class HomeController {
 			temp = sqlSessionFactory.getObject();
 			sqlSession = temp.openSession();
 
+			//새 글 작성버튼을 누르면, 게시글 번호를 0으로 리턴한다.
+			//게시글 번호가 0인 게시글은 있을 수 없으므로, 아예 처음부터 쓰도록 되어있다.
+
+			//수정 버튼을 누르면 기존 게시글 번호를 리턴하여 이를 토대로 쿼리문을 통해 정보를 읽어온다.
 			postDataMap = sqlSession.selectOne("diary.loadPost", Integer.parseInt((String) paramMap.get("postNum")));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		model.addAttribute("postDataMap", postDataMap);
+		session.setAttribute("focusedPost", postDataMap);
 		model.addAttribute("includePage", "writePost");
 		return "diary";
 	}
@@ -388,7 +395,6 @@ public class HomeController {
 			sqlSession = temp.openSession();
 
 			postDataMap = sqlSession.selectOne("diary.loadPost", Integer.parseInt(request.getParameter("postNum")));
-			System.out.println(postDataMap);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -492,24 +498,81 @@ public class HomeController {
 		 * 따라서 http://servlets.com 에서 제공하는 cos.jar 파일에 있는 필요한 컴포넌트를 사용하기 위해 이를 WEB-INF lib에
 		 * 설치하였다.
 		 */
-		String path = "D:/git/wsBlog/Diaret/src/main/webapp/resources/userData";
+		Enumeration<String> temp1 = session.getAttributeNames();
+		while(temp1.hasMoreElements()) {
+			System.out.println(temp1.nextElement());
+		}
 
 		SqlSessionFactory temp = null;
 		SqlSession sqlSession = null;
 		MultipartRequest mr = null;
 
 		try {
-
-			mr = new MultipartRequest(request, path, 1024*1024*10, "utf-8", new DefaultFileRenamePolicy());
-
 			temp = sqlSessionFactory.getObject();
 			sqlSession = temp.openSession();
+
+			Map<String, Object> focusedPost = (Map<String, Object>) session.getAttribute("focusedPost");
+
+			String dir = "";
+			String fileName = "";
+			String filePath = "";
+			File fileDir = null;
+			File file = null;
+
+
+			if(focusedPost == null || focusedPost.isEmpty()) {
+				//새로 적는 게시글이므로 폴더 이름을 정하기 위해 게시글 번호 중 가장 높은 게시글 번호를 가져오는 쿼리문 작성
+				//임시번호
+				int tempPostNum = -1;
+				//path설정(유저 폴더는 userDataMap에서 가져오기)
+
+				dir = "D:/git/wsBlog/Diaret/src/main/webapp/resources/userData/" + focusedPost.get("POST_USER_NUM") + "/posts";
+
+				fileDir = new File(dir);
+				if(!fileDir.isDirectory()) {
+					fileDir.mkdirs();
+				}
+				fileName = tempPostNum +".jsp";
+
+				file = new File(dir, fileName);
+				if(!file.exists()) {
+					file.createNewFile();
+				}
+
+				filePath = dir+"/"+fileName;
+			} else {
+				//기존 게시글을 수정하는 것이므로 있던 폴더 이름을 설정
+				dir = "D:/git/wsBlog/Diaret/src/main/webapp/resources/userData/" + focusedPost.get("POST_USER_NUM") + "/posts";
+
+				fileDir = new File(dir);
+				if(!fileDir.isDirectory()) {
+					fileDir.mkdirs();
+				}
+				fileName = focusedPost.get("POST_NUM") +".jsp";
+
+				file = new File(dir, fileName);
+				if(!file.exists()) {
+					file.createNewFile();
+				}
+
+				filePath = dir+"/"+fileName;
+			}
+			//이 객체를 선언하면, 파일 저장까지 완료된다고 함.
+			//중복 파일이 있으면 저장 시 규칙을 정할 수 있다. 정하지 않았다면 기본적으로 덮어쓰기를 한다.
+			mr = new MultipartRequest(request, dir, 1024*1024*10, "utf-8");
+
+			Map<String, Object> userDataMap = (Map<String, Object>) session.getAttribute("userDataMap");
+
+			String pageDirective = "<%@ page language=\"java\" contentType=\"text/html; charset=UTF-8\" pageEncoding=\"UTF-8\"%>";
+
+			writeToPost(file, pageDirective + (String) mr.getParameter("contentHtml"), (Integer) userDataMap.get("USER_NUM"));
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			sqlSession.close();
 		}
+
 		request.setAttribute("includePage", "post");
 		return "diary";
 	}
@@ -530,6 +593,32 @@ public class HomeController {
 			e.printStackTrace();
 		} finally {
 			try {
+				fos.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	//게시글 내용 저장
+	public void writeToPost(File file, String contentHtml, int userNum) {
+
+		System.out.println(contentHtml);
+
+		FileOutputStream fos = null;
+		DataOutputStream dos  = null;
+		try {
+			// \n은 unix에서의 개행, \r은 mac에서의 개행, \r\n은 windows에서의 개행이다.
+			fos = new FileOutputStream(file);
+			dos = new DataOutputStream(fos);
+			dos.writeUTF(contentHtml);
+			dos.flush();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				dos.close();
 				fos.close();
 			} catch (IOException e) {
 				e.printStackTrace();

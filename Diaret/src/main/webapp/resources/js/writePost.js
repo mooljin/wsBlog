@@ -135,6 +135,7 @@ $(document).ready(function() {
 		} else {
 			$("#postForm").attr("action", "savePost.do");
 			$("#contentHtml").val($("#editor").html());
+			$("#contentText").val($("#editor").text());
 			console.log($("#contentHtml").val());
 
 			$("#postForm").submit();

@@ -46,5 +46,6 @@
 	<div id="editor" contenteditable="true">
 		${ postDataMap.POST_CONTENT }
 	</div>
+	<input id="contentText" type="hidden" name="contentText"/>
 	<input id="contentHtml" type="hidden" name="contentHtml"/>
 </form>

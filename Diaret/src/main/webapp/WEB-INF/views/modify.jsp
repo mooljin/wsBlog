@@ -84,7 +84,7 @@
 					<input id="identifyInput" type="password" class="form-control" placeholder="현재 비밀번호" value="diaret2010"/>
 					<button id="identifySubmit" type="button" class="btn btn-default" data-dismiss="modal">확인</button>
 					<button id="identifyCancel" type="button" class="btn btn-default" data-dismiss="modal">취소</button>
-					<input id="sessionUserPw" type="hidden" value="${ userDataMap.USER_PW }">
+					<input id="sessionUserPw" type="hidden" value="${ userDataMap.USER_PW }"/>
 				</form>
 			</div>
 		</div>
