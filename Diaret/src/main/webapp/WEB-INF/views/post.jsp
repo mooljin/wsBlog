@@ -8,12 +8,12 @@
 <!-- css import end -->
 <!-- top UI -->
 <div id="topDiv">
-	<p id="categoryTitle"><i class="bi bi-folder-fill"></i>${ focusedPost.POST_CATEGORY }</p>
-	<p id="postTitle">${ focusedPost.POST_TITLE }</p>
+	<p id="categoryTitle"><i class="bi bi-folder-fill"></i>${ postDataMap.POST_CATEGORY }</p>
+	<p id="postTitle">${ postDataMap.POST_TITLE }</p>
 	<div id="displayFlex">
-		<p id="postDate">${ focusedPost.POST_DATE }</p>
+		<p id="postDate">${ postDataMap.POST_DATE }</p>
 		<form id="postOptionForm">
-			<input id="postNum" type="hidden" name="postNum" value="${ focusedPost.POST_NUM }"/>
+			<input id="postNum" type="hidden" name="postNum" value="${ postDataMap.POST_NUM }"/>
 			<button id="newPost" type="button" class="btn btn-success">새 글</button>
 			<button id="modifyPost" type="button" class="btn btn-success">수정</button>
 			<button id="deletePost" type="button" class="btn btn-danger">삭제</button>
@@ -27,5 +27,5 @@
 
 	<!-- 아래는 최종 버전 -->
 <div id="bottomDiv">
-	<%-- <jsp:include page="${ pageContext.request.contextPath }/../resources/userData/${ focusedPost.POST_USER_NUM }/posts/${ focusedPost.POST_NUM }.jsp"/> --%>
+	<jsp:include page="${ pageContext.request.contextPath }/../resources/userData/${ postDataMap.POST_USER_NUM }/posts/${ postDataMap.POST_NUM }.jsp"/>
 </div>

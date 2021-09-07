@@ -1,32 +1,21 @@
 package com.wscompany.diaret;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.swing.text.Position.Bias;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -41,9 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.oreilly.servlet.MultipartRequest;
-import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
-import com.sun.xml.internal.ws.api.model.MEP;
-
 
 @Controller
 public class HomeController {
@@ -129,7 +115,7 @@ public class HomeController {
 					} else {
 						//보유 중인 게시글이 있으면 가장 최신 게시글을 보여줌.
 						Map<String, Object> latestPost = sqlSession.selectOne("main.loadLatestPost", userDataMap.get("USER_NUM"));
-						model.addAttribute("focusedPost", latestPost);
+						model.addAttribute("postDataMap", latestPost);
 						model.addAttribute("includePage", "post");
 					}
 					model.addAttribute("login", "success");
@@ -371,13 +357,20 @@ public class HomeController {
 			//새 글 작성버튼을 누르면, 게시글 번호를 0으로 리턴한다.
 			//게시글 번호가 0인 게시글은 있을 수 없으므로, 아예 처음부터 쓰도록 되어있다.
 
-			//수정 버튼을 누르면 기존 게시글 번호를 리턴하여 이를 토대로 쿼리문을 통해 정보를 읽어온다.
-			postDataMap = sqlSession.selectOne("diary.loadPost", Integer.parseInt((String) paramMap.get("postNum")));
+			String postNum = (String) paramMap.get("postNum");
+			if(postNum == null) {
+				//만약 noPost의 "새 글 작성"을 눌렀다면 postNum이 아예 null값으로 올 것이다.
+
+			} else {
+				//수정 버튼을 누르면 기존 게시글 번호를 리턴하여 이를 토대로 쿼리문을 통해 정보를 읽어온다.
+				postDataMap = sqlSession.selectOne("diary.loadPost", Integer.parseInt((String) paramMap.get("postNum")));
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		session.setAttribute("focusedPost", postDataMap);
+		session.setAttribute("postDataMap", postDataMap);
 		model.addAttribute("includePage", "writePost");
 		return "diary";
 	}
@@ -398,7 +391,7 @@ public class HomeController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		request.setAttribute("focusedPost", postDataMap);
+		request.setAttribute("postDataMap", postDataMap);
 		request.setAttribute("includePage", "post");
 
 		return "diary";
@@ -511,60 +504,101 @@ public class HomeController {
 			temp = sqlSessionFactory.getObject();
 			sqlSession = temp.openSession();
 
-			Map<String, Object> focusedPost = (Map<String, Object>) session.getAttribute("focusedPost");
+			Map<String, Object> postDataMap = (Map<String, Object>) session.getAttribute("postDataMap");
+			Map<String, Object> userDataMap = (Map<String, Object>) session.getAttribute("userDataMap");
 
 			String dir = "";
 			String fileName = "";
-			String filePath = "";
 			File fileDir = null;
 			File file = null;
 
-
-			if(focusedPost == null || focusedPost.isEmpty()) {
+			if(postDataMap == null || postDataMap.isEmpty()) {
 				//새로 적는 게시글이므로 폴더 이름을 정하기 위해 게시글 번호 중 가장 높은 게시글 번호를 가져오는 쿼리문 작성
-				//임시번호
-				int tempPostNum = -1;
+				//아예 게시글이 없다면 0이 아니라 null을 반환한다.
+				//auto_increment는 모든 게시글을 싹 지워도 순번을 이어간다. 항상 1번으로 시작된다는 보장이 없다.
+				//최근 auto_increment로 생성된 번호를 찾는 것을 만들어보자.
+				Integer max = sqlSession.selectOne("post.loadLatestPostNum");
+				int postNum = 0;
+				if(max == null) {
+					postNum = 1;
+				} else {
+					postNum = max + 1;
+				}
+				System.out.println(postNum);
 				//path설정(유저 폴더는 userDataMap에서 가져오기)
 
-				dir = "D:/git/wsBlog/Diaret/src/main/webapp/resources/userData/" + focusedPost.get("POST_USER_NUM") + "/posts";
+				dir = "D:/git/wsBlog/Diaret/src/main/webapp/resources/userData/" + (Integer) userDataMap.get("USER_NUM") + "/posts";
 
 				fileDir = new File(dir);
 				if(!fileDir.isDirectory()) {
 					fileDir.mkdirs();
 				}
-				fileName = tempPostNum +".jsp";
+				fileName = postNum +".jsp";
 
 				file = new File(dir, fileName);
+
 				if(!file.exists()) {
 					file.createNewFile();
 				}
 
-				filePath = dir+"/"+fileName;
+				//게시글 정보를 insert
+				//필요한 파라미터 : #{postCategory}, #{postTitle}, #{postDate}, #{postUserNum}, #{postKeywords}
+
+				//중복 파일이 있으면 저장 시 규칙을 정할 수 있다. 정하지 않았다면 기본적으로 덮어쓰기를 한다.
+				mr = new MultipartRequest(request, dir, 1024*1024*10, "utf-8");
+
+				//날짜 뽑아내기
+				Date date = new Date();
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd(EEE) HH:mm:ss");
+
+				String postCategory = mr.getParameter("category");
+				String postTitle = mr.getParameter("title");
+				String postDate = sdf.format(date);
+				Integer postUserNum = (Integer) userDataMap.get("USER_NUM");
+				String postKeywords = (String) mr.getParameter("contentText");
+
+				HashMap<String, Object> paramMap = new HashMap<String, Object>();
+				paramMap.put("postCategory", postCategory);
+				paramMap.put("postTitle", postTitle);
+				paramMap.put("postDate", postDate);
+				paramMap.put("postUserNum", postUserNum);
+				paramMap.put("postKeywords", postKeywords);
+
+				sqlSession.insert("post.insertPost", paramMap);
 			} else {
 				//기존 게시글을 수정하는 것이므로 있던 폴더 이름을 설정
-				dir = "D:/git/wsBlog/Diaret/src/main/webapp/resources/userData/" + focusedPost.get("POST_USER_NUM") + "/posts";
+				dir = "D:/git/wsBlog/Diaret/src/main/webapp/resources/userData/" + postDataMap.get("POST_USER_NUM") + "/posts";
 
 				fileDir = new File(dir);
 				if(!fileDir.isDirectory()) {
 					fileDir.mkdirs();
 				}
-				fileName = focusedPost.get("POST_NUM") +".jsp";
+				fileName = postDataMap.get("POST_NUM") +".jsp";
 
 				file = new File(dir, fileName);
 				if(!file.exists()) {
 					file.createNewFile();
 				}
 
-				filePath = dir+"/"+fileName;
-			}
-			//이 객체를 선언하면, 파일 저장까지 완료된다고 함.
-			//중복 파일이 있으면 저장 시 규칙을 정할 수 있다. 정하지 않았다면 기본적으로 덮어쓰기를 한다.
-			mr = new MultipartRequest(request, dir, 1024*1024*10, "utf-8");
+				//게시글 정보를 update
+				//필요한 파라미터 : #{postCategory}, #{postTitle}, #{postKeywords}, #{postNum}
+				mr = new MultipartRequest(request, dir, 1024*1024*10, "utf-8");
 
-			Map<String, Object> userDataMap = (Map<String, Object>) session.getAttribute("userDataMap");
+				String postCategory = mr.getParameter("category");
+				String postTitle = mr.getParameter("title");
+				String postKeywords = (String) mr.getParameter("contentText");
+				Integer postNum = (Integer) postDataMap.get("POST_NUM");
+
+				HashMap<String, Object> paramMap = new HashMap<String, Object>();
+				paramMap.put("postCategory", postCategory);
+				paramMap.put("postTitle", postTitle);
+				paramMap.put("postKeywords", postKeywords);
+				paramMap.put("postKeywords", postNum);
+
+				sqlSession.update("post.updatePost", paramMap);
+			}
 
 			String pageDirective = "<%@ page language=\"java\" contentType=\"text/html; charset=UTF-8\" pageEncoding=\"UTF-8\"%>";
-
 			writeToPost(file, pageDirective + (String) mr.getParameter("contentHtml"), (Integer) userDataMap.get("USER_NUM"));
 
 		} catch (Exception e) {
@@ -609,6 +643,7 @@ public class HomeController {
 		DataOutputStream dos  = null;
 		try {
 			// \n은 unix에서의 개행, \r은 mac에서의 개행, \r\n은 windows에서의 개행이다.
+			// BOM? 이라는 것에 의해 앞에 항상 이상한 글자가 붙는 것으로 추측된다. 해결방법을 모르겠음.
 			fos = new FileOutputStream(file);
 			dos = new DataOutputStream(fos);
 			dos.writeUTF(contentHtml);

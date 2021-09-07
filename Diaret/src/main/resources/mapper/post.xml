@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="post">
+	<!-- LAST_INSERT_ID() : 최근 실행된 auto_increment 값을 가져온다. -->
+	<select id="loadLatestPostNum" resultType="Integer">
+		SELECT LAST_INSERT_ID();
+	</select>
+	<insert id="insertPost" parameterType="Map" >
+		INSERT INTO POST_INFO (POST_CATEGORY, POST_TITLE, POST_DATE, POST_USER_NUM, POST_KEYWORDS)
+		VALUES (#{postCategory}, #{postTitle}, #{postDate}, #{postUserNum}, #{postKeywords});
+	</insert>
+	<update id="updatePost" parameterType="Map" >
+		UPDATE POST_INFO
+		   SET POST_CATEGORY = #{postCategory}, POST_TITLE = #{postTitle}, POST_KEYWORDS = #{postKeywords}
+		 WHERE POST_NUM = #{postNum}
+	</update>
+	<delete id="deletePost" parameterType="Map" >
+		DELETE FROM POST_INFO
+		 WHERE POST_NUM = #{postNum}
+	</delete>
+</mapper>
